@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>信息安全数学基础 · 题库</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg-primary:#FAF9F6;--bg-sidebar:#F0EFED;--bg-card:#FFFFFF;
+  --bg-hover:#F5F4F1;--bg-overlay:rgba(0,0,0,0.45);--bg-answer:#F7F6F3;
+  --text-primary:#2D3436;--text-secondary:#636E72;--text-muted:#B2BEC3;--text-inverse:#FFFFFF;
+  --accent:#4A6FA5;--accent-light:#6B8DB8;--accent-dark:#3A5A85;--accent-bg:#EDF2F7;
+  --emphasis:#E8833A;--emphasis-bg:#FEF3E8;
+  --success:#1B7A43;--success-bg:#E8F5E9;--success-border:#A5D6A7;
+  --warning:#C55A11;--warning-bg:#FFF3E0;--warning-border:#FFCC80;
+  --border:#E0DCD5;--border-light:#EDE9E2;--divider:#E8E4DD;
+  --star:#F0C040;--star-bg:#FFFBEB;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:16px;--radius-xl:24px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.06);--shadow-md:0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg:0 8px 24px rgba(0,0,0,0.10);--shadow-xl:0 16px 48px rgba(0,0,0,0.12);
+  --font-sans:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+  --sidebar-w:280px;
+}
+
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-primary);display:flex}
+
+/* Skip link */
+.skip-link{position:absolute;top:-100px;left:16px;z-index:2000;background:var(--accent);color:#fff;padding:8px 16px;border-radius:var(--radius-sm);text-decoration:none}
+.skip-link:focus{top:16px}
+
+/* Sidebar */
+.sidebar{
+  width:var(--sidebar-w);min-width:var(--sidebar-w);height:100vh;
+  background:var(--bg-sidebar);border-right:1px solid var(--border-light);
+  display:flex;flex-direction:column;overflow-y:auto;z-index:100;
+  transition:transform 0.35s cubic-bezier(0.16,1,0.3,1);
+}
+.sidebar-header{
+  padding:20px 20px 12px;border-bottom:1px solid var(--divider);
+  position:sticky;top:0;background:var(--bg-sidebar);z-index:2;
+}
+.sidebar-header h2{font-size:1.05rem;font-weight:600;color:var(--text-primary)}
+.sidebar-header .back-link{
+  font-size:0.8rem;color:var(--accent);text-decoration:none;margin-top:4px;display:inline-block
+}
+.sidebar-header .back-link:hover{text-decoration:underline}
+
+.sidebar-body{flex:1;overflow-y:auto;padding:12px 0}
+
+/* Chapter Tree */
+.chapter-list{list-style:none}
+.chapter-item{border-bottom:1px solid var(--border-light)}
+.chapter-toggle{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;padding:10px 20px;border:none;background:transparent;
+  font-family:var(--font-sans);font-size:0.9rem;font-weight:500;
+  color:var(--text-primary);cursor:pointer;text-align:left;
+  transition:background 0.15s;
+}
+.chapter-toggle:hover{background:var(--bg-hover)}
+.chapter-toggle.active{
+  background:var(--accent-bg);color:var(--accent);
+  border-left:3px solid var(--accent);padding-left:17px
+}
+.chapter-toggle .ch-name{flex:1}
+.chapter-toggle .ch-count{font-size:0.78rem;color:var(--text-muted);margin:0 8px}
+.chapter-toggle .ch-arrow{
+  font-size:0.7rem;transition:transform 0.25s;color:var(--text-muted)
+}
+.chapter-toggle.expanded .ch-arrow{transform:rotate(90deg)}
+
+.question-sublist{list-style:none;overflow:hidden;max-height:0;transition:max-height 0.3s ease-out}
+.question-sublist.open{max-height:2000px}
+.question-subitem{
+  display:flex;align-items:center;padding:7px 20px 7px 36px;
+  font-size:0.82rem;color:var(--text-secondary);cursor:pointer;
+  transition:background 0.15s;gap:6px
+}
+.question-subitem:hover{background:var(--bg-hover);color:var(--text-primary)}
+.question-subitem.current{background:var(--accent-bg);color:var(--accent);font-weight:500}
+.question-subitem .q-star{color:var(--star);font-size:0.7rem;flex-shrink:0;opacity:0.9}
+.question-subitem .q-status{font-size:0.65rem;flex-shrink:0;margin-left:auto;opacity:0.7}
+
+/* Filter Section */
+.filter-section{padding:16px 20px;border-top:1px solid var(--divider)}
+.filter-section h3{font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px}
+.filter-group{display:flex;flex-wrap:wrap;gap:6px}
+.filter-chip{
+  padding:4px 10px;border-radius:var(--radius-full);font-size:0.75rem;
+  border:1.5px solid var(--border);background:transparent;color:var(--text-secondary);
+  cursor:pointer;font-family:var(--font-sans);transition:all 0.15s
+}
+.filter-chip:hover{border-color:var(--accent-light);color:var(--accent)}
+.filter-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* Stats Entry */
+.stats-entry{
+  margin:8px 20px 16px;padding:10px 14px;border-radius:var(--radius-md);
+  background:var(--bg-hover);border:1px solid var(--border-light);
+  cursor:pointer;font-size:0.85rem;color:var(--text-secondary);
+  display:flex;align-items:center;gap:8px;transition:all 0.15s
+}
+.stats-entry:hover{background:var(--accent-bg);color:var(--accent)}
+.stats-entry svg{width:18px;height:18px;flex-shrink:0}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow-y:auto;min-width:0}
+
+/* Progress Bar */
+.progress-wrap{
+  padding:16px 24px;background:var(--bg-card);
+  border-bottom:1px solid var(--border-light);
+  position:sticky;top:0;z-index:10
+}
+.progress-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.progress-label{font-size:0.82rem;font-weight:500;color:var(--text-secondary)}
+.progress-stats{font-size:0.78rem;color:var(--text-muted)}
+.progress-track{height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;display:flex}
+.progress-seen{background:var(--accent);transition:width 0.5s ease-out}
+.progress-mastered{background:var(--success);transition:width 0.5s ease-out}
+
+/* Question Card */
+.card-area{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:clamp(16px,4vh,32px) 24px;overflow-y:auto}
+.question-card{
+  width:100%;max-width:780px;background:var(--bg-card);
+  border-radius:var(--radius-lg);box-shadow:var(--shadow-md);
+  overflow:hidden;animation:cardIn 0.30s ease-out
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.card-header{
+  display:flex;align-items:center;flex-wrap:wrap;gap:8px;
+  padding:18px 24px;border-bottom:1px solid var(--divider)
+}
+.badge{
+  font-size:0.76rem;font-weight:500;padding:3px 10px;border-radius:var(--radius-full);
+  letter-spacing:0.02em
+}
+.badge-chapter{background:var(--accent-bg);color:var(--accent)}
+.badge-type{background:var(--emphasis-bg);color:var(--emphasis)}
+.badge-kp{background:var(--bg-hover);color:var(--text-secondary)}
+
+.bookmark-btn{
+  margin-left:auto;background:none;border:none;cursor:pointer;
+  font-size:1.3rem;color:var(--text-muted);padding:4px;line-height:1;
+  transition:all 0.25s cubic-bezier(0.68,-0.55,0.265,1.55)
+}
+.bookmark-btn:hover{transform:scale(1.2)}
+.bookmark-btn.active{color:var(--star);transform:scale(1.05)}
+
+.card-body{padding:24px}
+.q-number{font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;letter-spacing:0.03em}
+.q-stem{font-size:1.08rem;line-height:1.7;color:var(--text-primary)}
+
+.card-nav{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  gap:8px;padding:18px 24px;border-top:1px solid var(--divider)
+}
+.nav-btn{
+  display:inline-flex;align-items:center;gap:4px;padding:8px 16px;
+  border:1.5px solid var(--accent);border-radius:var(--radius-md);
+  background:transparent;color:var(--accent);font-family:var(--font-sans);
+  font-size:0.88rem;font-weight:500;cursor:pointer;transition:all 0.2s
+}
+.nav-btn:hover{background:var(--accent-bg)}
+.nav-btn:active{transform:scale(0.97)}
+.nav-btn:disabled{opacity:0.4;cursor:not-allowed;border-color:var(--text-muted);color:var(--text-muted)}
+
+.answer-toggle-btn{
+  padding:8px 18px;border:none;border-radius:var(--radius-md);
+  background:var(--accent);color:#fff;font-family:var(--font-sans);
+  font-size:0.88rem;font-weight:500;cursor:pointer;transition:all 0.2s
+}
+.answer-toggle-btn:hover{background:var(--accent-dark)}
+.answer-toggle-btn:active{transform:scale(0.97)}
+.answer-toggle-btn.showing{background:var(--text-secondary)}
+
+/* Answer Panel */
+.answer-panel{
+  max-height:0;opacity:0;overflow:hidden;
+  transition:max-height 0.35s ease-in-out,opacity 0.35s ease-in-out,margin 0.35s ease-in-out;
+  margin:0 24px
+}
+.answer-panel.open{max-height:4000px;opacity:1;margin:0 24px 24px}
+.answer-inner{
+  background:var(--bg-answer);border-radius:var(--radius-md);
+  border-left:4px solid var(--accent);padding:20px 24px
+}
+.answer-inner h4{font-size:0.85rem;color:var(--accent);margin-bottom:10px;font-weight:600}
+.answer-content{font-size:0.95rem;line-height:1.7}
+
+/* Self-assess */
+.assess-row{
+  display:flex;gap:10px;margin-top:18px;padding-top:16px;
+  border-top:1px solid var(--divider);flex-wrap:wrap
+}
+.assess-btn{
+  flex:1;min-width:120px;padding:10px 14px;border-radius:var(--radius-md);
+  border:2px solid transparent;font-family:var(--font-sans);font-size:0.88rem;
+  font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px
+}
+.assess-mastered{
+  background:var(--success-bg);color:var(--success);border-color:var(--success-border)
+}
+.assess-mastered:hover,.assess-mastered.active{background:#C8E6C9;border-color:var(--success)}
+.assess-review{
+  background:var(--warning-bg);color:var(--warning);border-color:var(--warning-border)
+}
+.assess-review:hover,.assess-review.active{background:#FFE0B2;border-color:var(--warning)}
+
+/* Stats Modal */
+.modal-overlay{
+  position:fixed;inset:0;z-index:1000;background:var(--bg-overlay);
+  backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;
+  opacity:0;visibility:hidden;transition:all 0.3s ease
+}
+.modal-overlay.open{opacity:1;visibility:visible}
+.modal{
+  background:var(--bg-card);border-radius:var(--radius-xl);box-shadow:var(--shadow-xl);
+  width:92%;max-width:540px;max-height:85vh;overflow-y:auto;
+  padding:clamp(24px,4vw,36px);
+  transform:scale(0.95) translateY(12px);
+  transition:transform 0.3s cubic-bezier(0.16,1,0.3,1)
+}
+.modal-overlay.open .modal{transform:scale(1) translateY(0)}
+.modal-close{
+  position:absolute;top:16px;right:16px;background:none;border:none;
+  font-size:1.5rem;cursor:pointer;color:var(--text-muted);line-height:1;
+  width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center
+}
+.modal-close:hover{background:var(--bg-hover);color:var(--text-primary)}
+.modal h2{font-size:1.2rem;font-weight:600;margin-bottom:20px}
+
+.stat-item{margin-bottom:14px}
+.stat-label{font-size:0.82rem;color:var(--text-secondary);margin-bottom:4px}
+.stat-bar{height:8px;background:var(--border-light);border-radius:4px;overflow:hidden}
+.stat-bar-fill{height:100%;border-radius:4px;transition:width 0.6s ease-out}
+.stat-bar-mastered{background:var(--success)}
+.stat-bar-review{background:var(--emphasis)}
+.stat-bar-seen{background:var(--accent)}
+
+.chapter-stats{margin-top:20px}
+.chapter-stats h3{font-size:0.95rem;font-weight:600;margin-bottom:12px}
+.ch-stat-row{
+  display:flex;align-items:center;padding:8px 0;gap:12px;
+  border-bottom:1px solid var(--border-light)
+}
+.ch-stat-row:last-child{border-bottom:none}
+.ch-stat-name{width:90px;font-size:0.8rem;color:var(--text-secondary);flex-shrink:0}
+.ch-stat-bar-wrap{flex:1;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;display:flex}
+.ch-stat-mastered{background:var(--success)}
+.ch-stat-review{background:var(--emphasis-bg);background:var(--emphasis)}
+.ch-stat-unseen{background:var(--border-light)}
+.ch-stat-pct{width:48px;text-align:right;font-size:0.78rem;font-weight:500;color:var(--text-primary)}
+
+.weak-section{margin-top:16px}
+.weak-tag{
+  display:inline-block;padding:4px 10px;border-radius:var(--radius-full);
+  background:var(--warning-bg);color:var(--warning);font-size:0.76rem;
+  margin:3px 4px;font-weight:500
+}
+
+/* Skeleton Loader */
+.skeleton{background:linear-gradient(90deg,var(--bg-sidebar) 25%,var(--border-light) 50%,var(--bg-sidebar) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--radius-sm)}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skeleton-text{height:1rem;margin-bottom:8px}
+.skeleton-text.short{width:60%}
+
+/* Mobile */
+.hamburger{display:none;position:fixed;top:12px;left:12px;z-index:500;width:44px;height:44px;border:none;background:var(--bg-card);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);cursor:pointer;font-size:1.3rem;color:var(--text-primary)}
+.sidebar-backdrop{display:none;position:fixed;inset:0;z-index:90;background:rgba(0,0,0,0.3)}
+
+@media(max-width:767px){
+  .hamburger{display:flex;align-items:center;justify-content:center}
+  .sidebar{
+    position:fixed;left:0;top:0;height:100vh;z-index:200;
+    transform:translateX(-100%);
+    box-shadow:var(--shadow-xl)
+  }
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-backdrop.open{display:block}
+  .card-area{padding:12px}
+  .card-header{padding:14px 16px}
+  .card-body{padding:16px}
+  .card-nav{padding:14px 16px;justify-content:center}
+  .question-card{border-radius:var(--radius-md)}
+  .nav-btn{padding:8px 12px;font-size:0.82rem}
+  .progress-wrap{padding:12px 16px}
+  .modal{width:96%;max-width:none;border-radius:var(--radius-lg) var(--radius-lg) 0 0;max-height:90vh;margin-top:auto}
+  .modal-overlay{align-items:flex-end}
+  .assess-btn{min-width:100px;font-size:0.82rem}
+  .q-stem{font-size:0.98rem}
+  .badge{font-size:0.7rem;padding:2px 8px}
+}
+
+/* Keyboard hint */
+.kbd-hint{
+  position:fixed;bottom:12px;right:16px;font-size:0.7rem;color:var(--text-muted);
+  opacity:0;transition:opacity 0.5s;pointer-events:none
+}
+.kbd-hint.show{opacity:1}
+.kbd{display:inline-block;padding:1px 6px;border:1px solid var(--border);border-radius:3px;font-size:0.68rem;background:var(--bg-card);margin:0 2px}
+
+/* KaTeX override */
+.katex{font-size:1.05em}
+.katex-display{margin:1em 0;overflow-x:auto;overflow-y:hidden}
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">跳到主要内容</a>
+
+<!-- Hamburger -->
+<button class="hamburger" id="hamburger" aria-label="菜单" title="菜单">☰</button>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar" role="navigation" aria-label="题库目录">
+  <div class="sidebar-header">
+    <h2>题库目录</h2>
+    <a href="index.html" class="back-link">← 返回首页</a>
+  </div>
+  <div class="sidebar-body">
+    <ul class="chapter-list" id="chapterList"></ul>
+    <div class="filter-section">
+      <h3>题型筛选</h3>
+      <div class="filter-group" id="typeFilters"></div>
+      <h3 style="margin-top:12px">章节筛选</h3>
+      <div class="filter-group" id="chapterFilters"></div>
+    </div>
+    <div class="stats-entry" id="statsTrigger">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+      学习统计
+    </div>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main" id="main-content">
+  <div class="progress-wrap">
+    <div class="progress-info">
+      <span class="progress-label" id="progressLabel">加载中...</span>
+      <span class="progress-stats" id="progressStats"></span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-seen" id="progressSeen" style="width:0%"></div>
+      <div class="progress-mastered" id="progressMastered" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="card-area" id="cardArea">
+    <div class="question-card" style="padding:40px 24px">
+      <div class="skeleton skeleton-text" style="width:30%"></div>
+      <div class="skeleton skeleton-text" style="width:80%"></div>
+      <div class="skeleton skeleton-text" style="width:90%"></div>
+      <div class="skeleton skeleton-text short"></div>
+    </div>
+  </div>
+  <div class="kbd-hint" id="kbdHint">
+    <span class="kbd">←</span><span class="kbd">→</span> 切换题目 &nbsp;
+    <span class="kbd">Space</span> 查看答案 &nbsp;
+    <span class="kbd">S</span> 收藏
+  </div>
+</main>
+
+<!-- Stats Modal -->
+<div class="modal-overlay" id="statsModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="学习统计">
+    <button class="modal-close" id="statsClose" aria-label="关闭">&times;</button>
+    <h2>学习统计</h2>
+    <div id="statsContent"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script>
+
+const EMBEDDED_QUESTIONS = [{"id": 1, "chapter": "第1章 整数的可除性", "type": "计算题", "knowledge_point": "最大公因数", "stem": "题1-1 求(105, 95), (412, 232), (789, −2048), (48385, 97850)。", "answer": "以(412, 232)为例：\n412 = 1×232+180\n232 = 1×180+52\n180 = 3×52+24\n52 = 2×24+4\n24 = 6×4+0\n∴ (412, 232) = 4。\n\n其余：\n(105, 95) = 5\n(789, −2048) = 1\n(48385, 97850) = 5"}, {"id": 2, "chapter": "第1章 整数的可除性", "type": "证明题", "knowledge_point": "互素与算术基本定理", "stem": "题1-4 证明：a、b是正整数，如果(a, b)=1，则对任意正整数n，有(a^n, b^n)=1。", "answer": "由算术基本定理可知，a和b可以表示成多个素因子的乘积：\na = p₁p₂⋯pᵣ, b = q₁q₂⋯qₛ\n因为(a, b)=1，这表明a、b没有公共（相同）素因子（否则a、b存在公共因子，不能互质，与题干假设矛盾）。\na^n = (p₁p₂⋯pᵣ)^n, b^n = (q₁q₂⋯qₛ)^n\n显然a^n、b^n没有公共（相同）素因子，于是(a^n, b^n)=1，得证。"}, {"id": 3, "chapter": "第1章 整数的可除性", "type": "证明题", "knowledge_point": "整除与素因子分解", "stem": "题1-5 证明：a、b是整数，n是正整数，如果a^n | b^n，则a | b。", "answer": "证明方法1：将a、b表示成多个素因子的乘积：\na = p₁p₂⋯pᵣ, b = q₁q₂⋯qₛ\na^n = (p₁p₂⋯pᵣ)^n, b^n = (q₁q₂⋯qₛ)^n\n由于a^n | b^n，且以上都是素数因子，那么对任意的i有p_i的n次方|b^n，所以b^n中必然含有a的所有素因子，也就是b中必然含有a的所有素因子，故a|b，得证。\n\n证明方法2：如果a不能整除b，则a、b没有公共素因子，于是a^n|b^n不成立(a^n ∤ b^n)，与题设矛盾。"}, {"id": 4, "chapter": "第1章 整数的可除性", "type": "证明题", "knowledge_point": "互素性质与裴蜀等式", "stem": "题1-6 证明：a、b、c互素且非零，则(ab, c) = (a, b)(a, c)。", "answer": "证明方法1：因为a、b、c互素且非零，所以(a, b)(a, c)=1。又因为\na = p₁p₂⋯pᵣ, b = q₁q₂⋯qₛ\nab = p₁p₂⋯pᵣq₁q₂⋯qₛ\n又因为a、b、c互素且非零，所以a、b、c中没有公共(相同)素因子，明显ab和c也没有公共素因子，所以(ab, c) = (a, b)(a, c)。\n\n证明方法2：根据推论1-1，有\n(a, c)=1, (b, c)=1, ∃u, v, s, t s.t. ua+vc=1, sb+tc=1\n(ua+vc)(sb+tc)=1\n⇒ (us)ab+(vsb+uta+vtc)c=1\n取α=us, β=vsb+uta+vtc，则α(ab)+β(c)=1，故(ab, c)=1=(a,c)(b,c)。"}, {"id": 5, "chapter": "第1章 整数的可除性", "type": "证明题", "knowledge_point": "同余与整除", "stem": "题1-14 用同余证明：当n是奇数时，3整除(2^n+1)；当n是偶数时，3不能整除(2^n+1)。", "answer": "当n为奇数时：\n2 ≡ 2 ≡ −1 (mod 3) ⇒ 2^n ≡ (−1)^n ≡ −1 (mod 3) ⇒ 2^n+1 ≡ 0 (mod 3)\n因此3整除2^n+1。\n\n当n为偶数时：\n2 ≡ 2 ≡ −1 (mod 3) ⇒ 2^n ≡ (−1)^n ≡ 1 (mod 3) ⇒ 2^n+1 ≡ 2 (mod 3)\n因此3不能整除2^n+1。"}, {"id": 6, "chapter": "第1章 整数的可除性", "type": "证明题", "knowledge_point": "同余性质", "stem": "题1-15 (1) 如果ac ≡ bc (mod m)，且(c, m)=d，则a ≡ b (mod m/d)。\n(2) 如果a ≡ b (mod m_i), i=1,2,...,n，则a ≡ b (mod [m₁,m₂,...,mₙ])。", "answer": "(1) 证明方法1：(c,m)=d，ac ≡ bc (mod m)，则\nac = k₁m+r, bc = k₂m+r ⇒ ac = k₁d(m/d)+r, bc = k₂d(m/d)+r\n于是ac ≡ bc (mod m)，由于(c, m/d)=1，由定理1-16有a ≡ b (mod m/d)。\n\n证明方法2：m|(a−b)c ⇒ m/(m,c) | (a−b)·c/(m,c)，(m/(m,c), c/(m,c))=1\n根据定理1-10，于是m/(m,c)|(a−b) ⇒ m/d | (a−b) ⇒ a ≡ b (mod m/d)。\n\n(2) a ≡ b (mod m_i), i=1,2,...,n ⇒ a−b = k_i m_i, k_i ∈ Z（a−b是任意m_i的倍数），\n于是a ≡ b (mod [m₁,m₂,...,mₙ]) ⇔ [m₁,m₂,...,mₙ] | (a−b)。\n根据最小公倍数定义，[m₁,m₂,...,mₙ]是所有m_i公倍数的最小正整数，故所有m_i的公倍数都能被其整除。由于a−b是m₁,m₂,...,mₙ的公倍数，故结论成立。"}, {"id": 7, "chapter": "第2章 群", "type": "证明题", "knowledge_point": "群的单位元", "stem": "题2-5 证明：在群G中只有单位元满足方程x²=x。", "answer": "显然在群中单位元e满足方程x²=x。\n假设存在其他元素a∈G满足上述方程，即a²=a，两边同时乘以其逆元a⁻¹∈G，则\na·a·a⁻¹ = a·a⁻¹ = e ⇒ a = e\n所以在群G中只有单位元e满足方程。"}, {"id": 8, "chapter": "第2章 群", "type": "证明题", "knowledge_point": "交换群", "stem": "题2-6 如果群G中每一元都满足方程x²=e，那么G是交换群。", "answer": "因为群G中每个元素都满足方程x²=e，所以对群中任意元素a、b有：\naa = e, bb = e ⇒ (ab)² = e\n⇒ abab = e ⇒ aababb = ab ⇒ ba = ab\n所以G是交换群。"}, {"id": 9, "chapter": "第2章 群", "type": "证明题", "knowledge_point": "交换群充要条件", "stem": "题2-7 设G是一个群，证明G是交换群的充要条件是，对于G任意元素a、b都有(ab)²=a²b²。", "answer": "必要性：因为在群中对任意元素a、b，(ab)²=a²b²\n⇒ aabb = abab ⇒ (a⁻¹a)ab(bb⁻¹) = (a⁻¹a)ba(bb⁻¹) ⇒ ab = ba\n所以G是交换群。\n\n充分性：因为群G是交换群，所以对任意元素a、b，有ab=ba。方程两边左乘以a，右乘以b，有\naabb = abab ⇒ (ab)² = a²b²"}, {"id": 10, "chapter": "第2章 群", "type": "证明题", "knowledge_point": "群方程求解", "stem": "题2-8 设G是一个群，a、b、c是G中任意3个元素，证明：方程xaxba=xbc在G中有且仅有一解。", "answer": "由于a、b、c是G中任意3个元素，则存在相应逆元a⁻¹, b⁻¹∈G，则\nxaxba = xbc ⇒ a⁻¹x⁻¹xaxbaa⁻¹b⁻¹ = x⁻¹xbca⁻¹b⁻¹\n⇒ x = a⁻¹bca⁻¹b⁻¹\n所以存在唯一解x = a⁻¹bca⁻¹b⁻¹。\n假设存在另一解y=y(a,b,c)，则带入上述方程，根据上述求解步骤，必有y(a,b,c)=a⁻¹bca⁻¹b⁻¹。"}, {"id": 11, "chapter": "第2章 群", "type": "证明题", "knowledge_point": "逆元性质", "stem": "题2-9 证明：如果a、b是群中的任意元素，则(ab)⁻¹ = b⁻¹a⁻¹。", "answer": "对群中任意元素a、b有\n(ab)(ab)⁻¹ = e ⇒ b⁻¹a⁻¹ab(ab)⁻¹ = b⁻¹a⁻¹e ⇒ (ab)⁻¹ = b⁻¹a⁻¹\n所以结论成立。"}, {"id": 12, "chapter": "第2章 群", "type": "证明题", "knowledge_point": "子群", "stem": "题2-12 证明：设m为正整数，整数加群Z中每个元素的m倍数{0, ±m, ±2m, ±3m, ...}对加法也构成群，且是Z的子群mZ。", "answer": "1. 非空：mZ是群Z的一个非空子集。\n2. 封闭性：对整数加群(mZ,+)中的任意元素am、bm，显然有(am+bm)∈mZ，即任意整数相加仍然为整数，封闭性满足。\n3. 结合律：对整数加群(mZ,+)中的任意元素am、bm、cm，显然有(am+bm)+cm=am+(bm+cm)，结合律满足。\n4. 单位元与逆元：对整数加群(mZ,+)中的任意元素am，有am+(am)⁻¹=am+(−am)=0，即0为该群单位元，对任意元素am，其逆元为−am。\n5. 子群：因为对mZ中任意元素am、bm，有am−bm=(a−b)m，(a−b)∈Z，(a−b)m∈mZ ⇒ mZ≤Z，mZ⊆Z，所以mZ是Z的子群。"}, {"id": 13, "chapter": "第2章 群", "type": "证明题", "knowledge_point": "群同态映射", "stem": "题2-14 证明：f(ab)=f(a)f(b)将一个群映射成另一个群。", "answer": "设G是一个群，对任意a、b∈G，存在一个G到H的映射f，且f(ab)=f(a)f(b)。\n1. 封闭性：对任意f(a)、f(b)∈H，有f(a)f(b)=f(ab)∈H，即H满足运算的封闭性。\n2. 结合律：f(a)、f(b)、f(c)∈H，则\n(f(a)f(b))f(c)=f(ab)f(c)=f((ab)c)\nf(a)(f(b)f(c))=f(a)f(bc)=f(a(bc))\na,b,c∈G ⇒ (ab)c=a(bc)\n⇒ (f(a)f(b))f(c)=f(a)(f(b)f(c))，即H满足结合律。\n3. 单位元：∀f(a)∈H，f(a)f(e)=f(ae)=f(a)∈H ⇒ f(e)是H的单位元。\n4. 逆元：∀f(a)∈H，f(a)f(a⁻¹)=f(aa⁻¹)=f(e)∈H，所以f(a)的逆元为f(a⁻¹)，显然H是一个群。"}, {"id": 14, "chapter": "第2章 群", "type": "证明题", "knowledge_point": "同构映射", "stem": "题2-16 证明：群G为一交换群，当且仅当a→a⁻¹是一同构映射。", "answer": "假设a→a⁻¹的双射是f。\n\n充分性（交换群⇒同构）：若G是交换群，则f(ab)=(ab)⁻¹=b⁻¹a⁻¹=a⁻¹b⁻¹=f(a)f(b)，即f是同态。又f是双射（每个元素有唯一逆元），故f是同构。\n\n必要性（同构⇒交换群）：∀a,b∈G，f(a)=a⁻¹, f(b)=b⁻¹, f(ab)=(ab)⁻¹\nf(ab)=f(a)f(b)（同构映射）\nf(ab)=(ab)⁻¹\nf(a)f(b)=a⁻¹b⁻¹=(ba)⁻¹\n⇒ (ab)⁻¹=(ba)⁻¹ ⇒ (ab)(ab)⁻¹(ba)=(ab)(ba)⁻¹(ba)\n⇒ ab=ba，所以G是交换群。"}, {"id": 15, "chapter": "第3章 循环群与群的结构", "type": "证明题", "knowledge_point": "元素的阶", "stem": "题3-2 证明：(1)在一个有限群里，阶大于2的元素个数一定是偶数。\n(2)假设G是一个阶为偶数的有限群，则G中阶为2的元素个数一定是奇数。", "answer": "(1)设该有限群为G，对任意阶大于2的元素a∈G，有a^n=e，n为使得上式成立的最小正整数且n>2。明显在群中存在a⁻¹∈G且a≠a⁻¹，否则a=a⁻¹⇒a²=e，与a的阶大于2矛盾。于是(a⁻¹)^n=e, n>2，所以a⁻¹的阶也大于2。于是对任意阶大于2的元素a，存在a⁻¹的阶也大于2，这说明a与a⁻¹的阶相等。于是在有限群G中成对取a, a⁻¹∈G可以取完所有阶n>2的所有元素，所以在一个有限群中，阶大于2的元素个数一定是偶数。\n\n(2)如果n>2是偶数，设n=2k, k∈Z⁺，根据命题(1)：一个有限群G中，阶大于2的元素个数为偶数，并且仅有单位元e，有e^n=e²=e⇒n=1。又由于G是一个阶为偶数的有限群，所以G中阶为2的元素个数一定是奇数。注：1（仅有e的阶为1）+奇数（不等于1的）才能等于偶数。"}, {"id": 16, "chapter": "第3章 循环群与群的结构", "type": "证明题", "knowledge_point": "循环群生成元", "stem": "题3-5 假设a生成一个阶为n的循环群G，请证明：如果(m, n)=1，则a^m也生成G。", "answer": "对a生成一个阶为n的循环群G，则由推论3-1可得：a^m生成的循环群的阶为n/(n,m)=n/1=n。\n又因为a^m∈G，所以a^m也生成G。注意：这实际也是推论3-1的应用之一，并且生成元的表现形式发生了变化。"}, {"id": 17, "chapter": "第3章 循环群与群的结构", "type": "证明题", "knowledge_point": "循环群同态", "stem": "题3-6 假设G是循环群，并且G与G′满同态，证明G′也是循环群。", "answer": "设|G|=n，即设G的阶为n。由已知可得G′为一个群（封闭性，结合律，单位元，逆元）。\n并且G与G′满同态，则f(e)∈G′是单位元，且∀g∈G ⇒ f(g)∈G′，∀g^k∈G ⇒ f(g^k)∈G′\n⇒ f(g^k) = [f(g)]^k\n这说明G′中任意元素都可以由f(g)生成表示成[f(g)]^k，对k=n，\nf(g^n)=[f(g)]^n=f(e)\n也即n阶循环群中[f(g)]^n=f(e)∈G′，显然G′也是循环群。"}, {"id": 18, "chapter": "第3章 循环群与群的结构", "type": "计算题", "knowledge_point": "循环群的阶与生成元", "stem": "题3-8 分别求出13、16阶循环群各个元素的阶，并指出其生成元。", "answer": "13阶循环群：e的阶为1，其他元素阶为13。由于1,...,12不能整除13，也即与13互素，那么根据推论3-1，其生成元为g¹,...,g¹²。\n\n16阶循环群：e的阶为1。根据推论3-1，与16有最大公约数的生成元的阶为：\n生成元 g²  g⁴  g⁶  g⁸  g¹⁰  g¹²  g¹⁴\n阶      8   4   8   2    8     4    8\n与16互素的，其余的g到g¹⁵的阶为16且是生成元。"}, {"id": 19, "chapter": "第3章 循环群与群的结构", "type": "计算题", "knowledge_point": "循环群的真子群", "stem": "题3-9 分别求出15、20阶循环群的真子群。", "answer": "15阶与20阶的正因子分别为3,5和2,4,5,10，于是：\n3,5|15 ⇒ (g³), (g⁵)\n2,4,5,10|20 ⇒ (g²), (g⁴), (g⁵), (g¹⁰)\n即15阶的生成元为g³,g⁵，20阶的生成元为g²,g⁴,g⁵,g¹⁰。"}, {"id": 20, "chapter": "第3章 循环群与群的结构", "type": "证明题", "knowledge_point": "素数阶群同构", "stem": "题3-11 证明：设p是一个素数，任意两个p阶群都同构。", "answer": "分别根据推论3-1，推论3-4，定理3-1和定理3-5，当p为素数时，除1和自身外无其他因子，所以其生成元的阶p不变，且阶为p的群可生成循环群，且任意同阶的有限循环群同构，于是任意两个p阶群都同构。"}, {"id": 21, "chapter": "第3章 循环群与群的结构", "type": "证明题", "knowledge_point": "Sylow定理应用", "stem": "题3-12 证明：设p是一个素数，则阶是p^m的群一定有一个阶为p的子群。", "answer": "p是p^m的因子，且p是一个素数，则在有限群G的子群H中，根据推论3-3，有|H| | |G|，即H阶是G阶的因子，于是p^m阶群一定有阶为p的子群。"}, {"id": 22, "chapter": "第3章 循环群与群的结构", "type": "证明题", "knowledge_point": "可交换元素的阶", "stem": "题3-13 假设G是群，a,b∈G, ab=ba，并假设a的阶为m，b的阶为n，且(m,n)=1，请证明：ab的阶为mn。", "answer": "a^m=e, b^n=e, ab=ba\n⇒ (ab)^mn = (ba)^mn = a^mn·b^mn = e\n由于(m,n)=1，如果∃i, s.t. (ab)^i=e ⇒ (ab)^mi=e, (b)^mi=b^{ni}=e ⇒ mi|n —(m,n)=1—→ i|n\n同理可得：i|m，由于(m,n)=1，所以mn是使得(ab)^i=e的最小正整数，即(ab)^mn=e。"}, {"id": 23, "chapter": "第3章 循环群与群的结构", "type": "证明题", "knowledge_point": "正规子群", "stem": "题3-15 证明：两个正规子群的交仍然是正规子群。", "answer": "设H₁,H₂是群G的两个正规子群，即H₁,H₂◁G，于是\n∀a∈G, h₁∈H₁ ⇒ ah₁a⁻¹∈H₁\nh₂∈H₂ ⇒ ah₂a⁻¹∈H₂\n⇒ aha⁻¹∈H for ∀h∈H=H₁∩H₂\n并且H◁G，所以两个正规子群的交仍然是正规子群。"}, {"id": 24, "chapter": "第3章 循环群与群的结构", "type": "证明题", "knowledge_point": "指数为2的子群", "stem": "题3-16 证明：指数为2的子群一定是正规子群。", "answer": "指数为2的子群eH, aH是群H的唯一两个左陪集，否则与指数为2的子群矛盾。又由于\nG=H∪aH, H∩aH=∅\nG=H∪Ha, H∩Ha=∅\n⇒ aH=Ha ⇒ aH◁H, eH◁H\n因此指数为2的子群一定是正规子群。"}, {"id": 25, "chapter": "第3章 循环群与群的结构", "type": "证明题", "knowledge_point": "子群乘积", "stem": "题3-17 假设H是G的子群，N是G的正规子群，请证明：HN是G的子群。", "answer": "H是G的子群，N是G的正规子群，则HN=NH，即HN=NH ⇒ ∀hn∈HN ⇒ ∃n′, hn=n′h，于是\n∀h₁n₁∈HN, h₂n₂∈HN,\n(h₁n₁)(h₂n₂)⁻¹ = h₁n₁n₂⁻¹h₂⁻¹ = n₁′h₁n₂′h₂⁻¹ = h₁h₂⁻¹n₁′n₂′∈HN\n根据定理2-5，有HN<G，即HN是G的子群。"}, {"id": 26, "chapter": "第4章 环", "type": "计算题", "knowledge_point": "复数的逆元", "stem": "题4-3 求复数环中元素a+ib的逆元。", "answer": "显然单位元为1，不妨设c+id是a+ib的逆元，那么\n(a+ib)(c+id)=1\n于是：c+id = (a-ib)/(a²+b²)\n也即：a+ib的逆元为(a-ib)/(a²+b²)。注意：一般默认a,b∈R。"}, {"id": 27, "chapter": "第4章 环", "type": "证明题", "knowledge_point": "环的定义与构造", "stem": "题4-4 Z为整数环，在集合Z×Z上定义加法和乘法如下：\n(a,b)+(c,d)=(a+c,b+d)\n(a,b)×(c,d)=(ac+bd, ad+bc)\n请证明Z×Z是一个具有单位元的环。", "answer": "加法群：\n1. 封闭性与结合律。显然整数的加法仍然是整数，并且满足结合律。\n2. 加法群中零元与负元。对任意的(a,b), a,b∈Z，存在零元(0,0)，负元(−a,−b)。\n3. (a,b)+(c,d)=(a+c,b+d)=(c+a,d+b)=(c,d)+(a,b)，所以Z×Z对于加法是交换群。\n\n乘法半群：\n1. 封闭性：由于(a,b)×(c,d)=(ac+bd, ad+bc)，所以Z×Z对于乘法封闭。\n2. 结合律：可验证乘法结合律成立。\n3. 单位元：(a,b)×(c,d)=(a,b) ⇒ (ac+bd, ad+bc)=(a,b) ⇒ c=1,d=0\n也即Z×Z是一个具有单位元(1,0)的环。"}, {"id": 28, "chapter": "第4章 环", "type": "判断题", "knowledge_point": "环的判断", "stem": "题4-6 Z和Q分别为整数环和有理数环，请判断以下集合对于普通加法和乘法是否可以构成环，是否有单位元，是否为交换环。\n(1) 5Z={5n|n∈Z}\n(2) Z[√5]={a+b√5|a,b∈Z}\n(3) Q[√5]={a+b√5|a,b∈Q}\n(4) Z⁺={a|a∈Z, a>0}", "answer": "(1) 5Z：是环✓，无单位元✗（5Z中无1），是交换环✓。\n(2) Z[√5]：是环✓，有单位元✓（1=1+0√5），是交换环✓。\n(3) Q[√5]：是环✓，有单位元✓，是交换环✓。\n(4) Z⁺：不是环✗（限制a>0，不能形成加法群，无零元与负元）。"}, {"id": 29, "chapter": "第4章 环", "type": "证明题", "knowledge_point": "子环的判定", "stem": "题4-7 请证明环的子集S构成一个子环的条件是：对于任意的a,b∈S，有a−b∈S, ab∈S。", "answer": "由于S是环的子集，所以S满足所有的运算规律：\n1. 加法交换群：显然封闭性与对任意a,b∈S，有a−b∈S，所以S中存在零元0，对任意a，存在负元−a，使得a+(−a)=a−a=0∈S。b∈S, −b∈S，于是S对于加法是封闭的，且任意元素都有对应的负元。由于S对于加法符合交换律(a+b=b+a)，所以S对于加法还是一个交换群。\n2. 乘法半群：对任意a,b∈S，S关于乘法封闭，有ab∈S，又由于环中满足乘法结合律与分配律。所以S是该环的子环。"}, {"id": 30, "chapter": "第4章 环", "type": "判断题", "knowledge_point": "子环的判断", "stem": "题4-8 奇数集合是否构成整数环Z的子环？（注意0不是奇数也不是偶数）", "answer": "不能，因为奇数集合对于加法无零元，不符合构成环的条件。"}, {"id": 31, "chapter": "第4章 环", "type": "证明题", "knowledge_point": "子环的构造", "stem": "题4-11 设R是一个环，a∈R，证明S={x|x∈R, ax=0}是R的子环。", "answer": "对任意x,y∈S，有\nax=0, ay=0 ⇒ ax−ay=a(x−y)=0 ⇒ x−y∈S\naxy=(ax)y=a(xy)=0 ⇒ xy∈S\n所以S是R的子环。"}, {"id": 32, "chapter": "第4章 环", "type": "计算题", "knowledge_point": "零因子", "stem": "题4-15 求模100剩余类的所有零因子。", "answer": "√100=10，其对应的因子，显然有2和5，于是2和5的倍数形成的剩余类为模100剩余类的所有零因子，也即：\n2,4,6,8,10,...,96,98; 5,15,25,...,95"}, {"id": 33, "chapter": "第4章 环", "type": "证明题", "knowledge_point": "除环", "stem": "题4-19 证明：一个无零因子且有两个以上元素的有限环是除环。", "answer": "假设S是环，根据题意，仅需要证明S的非零元构成一个乘法群即可。假设该群中非零元素a₁,a₂,...,aₙ,n≥1，因为环对乘法封闭，所以a₁a₂...aₙ∈S，定义满射：\na₁a₂...aₙ=a_i, i=1,2,...,n\n显然，其单位元为：a₁a₂...aₙ=a₁...a_{j≠i}...aₙ（注意：一个无零因子且有两个以上元素a_i的有限环），其逆元为：\n(a_i)⁻¹ = a₁...a_{j≠i}...aₙ/a_i\n因此无论乘法是否可以交换，该环对乘法都构成群，所以为除环。"}, {"id": 34, "chapter": "第4章 环", "type": "证明题", "knowledge_point": "有限整环与域", "stem": "题4-20 有限整环是域。", "answer": "有限整环已经是交换环。于是需证有限环S对全体非零元，都有逆元。设S={a₁,a₂,...,aₙ}有1∈S，对任意非零a_i，有a_i S = {a_i a₁, a_i a₂, ..., a_i aₙ}。（注意可以跑遍所有指标，即跑遍环的所有元素），并且乘法封闭（环对乘法形成半群），有a_i S=S。所以存在1∈a_i S，a_j使得a_i a_j=1，即a_i的逆元存在，所以结论成立。"}, {"id": 35, "chapter": "第4章 环", "type": "证明题", "knowledge_point": "子除环的条件", "stem": "题4-21 证明一个除环的一个子集S构成一个子除环的条件是：\n1. S包含非零元；\n2. 对于任意a,b∈S，有a−b∈S；\n3. 对于任意a,b∈S, b≠0，有ab⁻¹∈S。", "answer": "1. 若子集S仅含有零元，则其非零元为空集，此时不构成环，所以S含有非零元。\n2. 设该除环为R，则对任意的b∈S，有b+(−b)=b−b∈S，即S中有零元，并且有负元−b∈S；注意除环的子集满足除环的运算规则，则S中元素均有负元，对于任意a,b∈S，有a−b∈S，并且对加法封闭，并满足结合律与交换律，并且S对加法构成交换群。\n3. S中任意非零元都有逆元，且S对乘法封闭，所以S也符合乘法交换律。所以S中非零元对乘法构成交换群，也即对于任意a,b∈S, b≠0，有ab⁻¹∈S，所以除环S是环R的子除环。"}, {"id": 36, "chapter": "第4章 环", "type": "证明题", "knowledge_point": "矩阵环与整环", "stem": "题4-22 Q为有理数集合，设S={[a 0; 0 b] | a,b∈Q}\n请证明S对于矩阵的加法和乘法是有单位元的交换环。S是否为整环？", "answer": "1. 因为有理数集Q是一个域，并且其中可进行四则运算（0作除数除外），S中加法结合律成立，有理数中的四则运算仍然是有理数，所以S封闭性得证。0=diag{0,0}为零元，负元diag{−a,−b}∈S，所以S对于加法形成交换群。\n2. S对于乘法的封闭性和结合律满足，且S中存在单位元I=diag{1,1}，于是S对于矩阵加法和乘法是有单位元的交换环。\n3. S不是整环：取S中diag{a,0}≠0, diag{0,d}≠0，显然diag{a,0}·diag{0,d}=diag{0,0}=0，S中有零因子。"}, {"id": 37, "chapter": "第4章 环", "type": "证明题", "knowledge_point": "整环与域", "stem": "题4-23 设S={a+bi|a,b∈Z, i=√−1}，证明S对于复数的加法和乘法是整环，但不是域。", "answer": "由题4-3已知，复数形成环。\n1. 含幺环：显然单位元为1。\n2. 交换环：对任意的a,b,c,d∈S，(a+bi)(c+di)=(ac−bd)+(bc+ad)i=(c+di)(a+bi)。\n3. 无零因子环：可证S₁S₂=0⇒S₁=0或S₂=0。所以S是一个整环。\n4. 实际上，a/(a²+b²), b/(a²+b²)∉Z，也即逆元不属于S，所以S不是域。"}, {"id": 38, "chapter": "第4章 环", "type": "证明题", "knowledge_point": "环同构", "stem": "题4-25 设R为一具有单位元的交换环，在R中定义：\na⊕b=a+b−1, a⊙b=a+b−ab\n请证明在定义的新运算下，R是具有单位元的交换环，并与原来的环同构。", "answer": "1. 根据环的定义，满足对加法形成群，并且\na⊕b=a+b−1=b+a−1=b⊕a\n即对加法形成交换群。同样容易验证，R对乘法形成半群。乘法意义下的单位元，显然为b=0，这是因为a⊙0=a+0−a·0=a。而且乘法结合律与分配律也容易验证成立，并且R为一具有单位元的交换环，a,b∈R, ab=ba，在新的运算法则下，a⊙b=a+b−ab=b+a−ba=b⊙a，所以R′是具有单位元的交换环。\n2. 建立一一映射：f:R→R′, a∈R, f(a)∈R′，也即f:(R,+,·)→(R′,⊕,⊙)，则\na⊕b=a+b−1→f(a)+f(b)−f(1)=f(a)⊕f(b)⇒f(a+b)=f(a)⊕f(b)\na⊙b=a+b−ab→f(a)+f(b)−f(ab)=f(a)⊙f(b)⇒f(ab)=f(a)⊙f(b)\n所以R≅R′即R与R′同构。"}, {"id": 39, "chapter": "第4章 环", "type": "计算题", "knowledge_point": "理想", "stem": "题4-28 假设R是偶数环，证明I={4r|r∈R}是R的理想，则I=(4)？", "answer": "对任意r₁,r₂∈R, 4(r₁−r₂)∈I，显然I是环R的加法子群。则i∈R, j∈I⇒j=4r, r∈R⇒ij=4ir=ji, ir∈R，于是j=ji∈I，所以I是R的理想。\n事实上，I不等于(4)，因为(4)={4x+4n|x∈R, n∈Z}取x=2, n=1，则12∈(4)，但因为R是偶数环，所以12∉I。"}, {"id": 40, "chapter": "第4章 环", "type": "证明题", "knowledge_point": "理想的运算", "stem": "题4-30 设s,t是两个非零整数，d=(s,t), m=[s,t]，证明在整数环中，\n(s)+(t)=(d), (s)∩(t)=(m)。", "answer": "1. 显然整数环中既有单位元，又是交换环，所以\n(s)={xs|x∈Z}, (t)={yt|y∈Z}\nxs+yt=xk₁d+yk₂d=(xk₁+yk₂)d∈(d)⇒(s)+(t)⊂(d)\nd=(s,t)⇒us+vt=d⇒rd=rus+rvt⇒(d)⊂(s)+(t)，得证。\n2. (s)={xs|x∈Z},(t)={yt|y∈Z}，且(s)∩(t)表示既是s的倍数又要t的倍数，且m=[s,t]，于是(s)∩(t)=(m)。"}, {"id": 41, "chapter": "第4章 环", "type": "证明题", "knowledge_point": "理想的和", "stem": "题4-37 设I₁,I₂是环R的两个理想，请证明I₁+I₂={a+b|a∈I₁, b∈I₂}也是理想。", "answer": "对任意x∈R, xI₁∈I₁, xI₂∈I₂，有\nx(I₁+I₂)=x(a+b)=xa+xb∈I₁+I₂\n(I₁+I₂)x=(a+b)x=ax+bx∈I₁+I₂\n所以I₁+I₂也是R的理想。"}, {"id": 42, "chapter": "第5章 多项式环", "type": "证明题", "knowledge_point": "多项式环无零因子", "stem": "题5-1 请证明F[x]无零因子。", "answer": "对任意非零多项式f(x),g(x)∈F[x]，设\nf(x)=a_nx^n+a_{n−1}x^{n−1}+⋯+a₁x+a₀, a_n≠0, a_i∈F\ng(x)=b_mx^m+b_{m−1}x^{m−1}+⋯+b₁x+b₀, b_m≠0, b_i∈F\n有f(x)g(x)=a_n b_m x^{m+n}+⋯+a₀b₀\n因为a_i, b_i∈F, a_n≠0, b_m≠0⇒a_n b_m≠0⇒f(x)g(x)≠0。\n注意如果是f(x)g(x)=0，就存在零因子了。如果全部为零，则为零多项式，此时有f(x)=0或g(x)=0，同样不存在零因子。于是结论成立。"}, {"id": 43, "chapter": "第5章 多项式环", "type": "计算题", "knowledge_point": "有限域上多项式运算", "stem": "题5-2 计算域GF[7]上两个多项式的和与乘积：\nf(x)=x⁶+5x⁴+x²+6x+1\ng(x)=x⁷+3x+1", "answer": "f(x)+g(x)=x⁷+x⁶+5x⁴+x²+9x+2=x⁷+x⁶+5x⁴+x²+2x+2（在GF(7)中）\nf(x)g(x)=x¹³+5x¹¹+x⁹+6x⁸+4x⁷+x⁶+x⁵+5x⁴+3x³+5x²+2x+1"}, {"id": 44, "chapter": "第5章 多项式环", "type": "证明题", "knowledge_point": "GF(2)上多项式性质", "stem": "题5-3 请证明GF(2)[x]上有[f(x)+g(x)]²=[f(x)]²+[g(x)]²。", "answer": "显然GF(2)[x]上满足交换律，有\n[f(x)+g(x)]²=[f(x)+g(x)][f(x)+g(x)]\n=[f(x)]²+f(x)g(x)+g(x)f(x)+[g(x)]²\n=[f(x)]²+[g(x)]²\n注意：此题目的证明思路结合5-2的证明思路。"}, {"id": 45, "chapter": "第5章 多项式环", "type": "计算题", "knowledge_point": "不可约多项式", "stem": "题5-4 验证f(x)=x⁵+x⁴+x²+x+1, g(x)=x⁵+x⁴+x³+x+1不可约。", "answer": "对应二进制表示为(1101111),(1110111)，显然分别用这两个除以2阶及以下的不可约多项式，都除不尽，故二者不可约。"}, {"id": 46, "chapter": "第5章 多项式环", "type": "计算题", "knowledge_point": "最大公因式", "stem": "题5-5 求GF(3)[x]上多项式f(x)=x⁶+x³+1, g(x)=x²+x+1的最大公因式。", "answer": "x⁶+x³+1=(x²+x+1)(x⁴+2x³+2x+1)\n即：x²+x+1是最大公因式。"}, {"id": 47, "chapter": "第5章 多项式环", "type": "计算题", "knowledge_point": "多项式取模", "stem": "题5-7 设GF(2)[x]上两个多项式f(x)=x⁵+x⁴+x³+x²+x+1, g(x)=x³+x+1，求f(x) mod g(x)。", "answer": "x⁵+x⁴+x³+x²+x+1=(x²+x)(x³+x+1)+x²+1\n也即：f(x) mod g(x)=x²+1。"}, {"id": 48, "chapter": "第6章 同余式", "type": "计算题", "knowledge_point": "完全剩余系", "stem": "题6-1 (1)写出模9的一个完全剩余系，它的每个数都为奇数。\n(2)写出模9的一个完全剩余系，它的每个数都为偶数。\n(3)对模10能够按(1)、(2)的要求写出来？", "answer": "(1) {9,1,11,3,13,5,15,7,17}\n(2) {0,10,2,12,4,14,6,16,8}\n(3) 不能。奇数+奇数=偶数，奇数+偶数=奇数。以0,...,9为例，9+10=19，模10下无法同时满足奇偶性一致且覆盖所有剩余类。"}, {"id": 49, "chapter": "第6章 同余式", "type": "证明题", "knowledge_point": "完全剩余系", "stem": "题6-2 证明：当m>2时，0²,1²,...,(m−1)²不是模m的完全剩余系。", "answer": "由于(m−1)²=m²−2m+1≡1(mod m)，比如取m=3，则\n0²≡0(mod 3), 1²≡1(mod 3), 2²≡1(mod 3)\n显然不能组成模m的完全剩余系。\n\n一般地：由于\nm|(m−1+1)(m−1−1)⇒m|[(m−1)²−1²]⇒(m−1)²≡1²(mod m)\nm|(m−2+2)(m−2−2)⇒m|[(m−2)²−2²]⇒(m−2)²≡2²(mod m)\n...\nm|(m−i+i)(m−i−i)⇒m|[(m−i)²−i²]⇒(m−i)²≡i²(mod m), 0≤i≤⌊(m−1)/2⌋\n故0²,1²,...,(m−1)²中存在模m同余，一定不是模m的完全剩余系。"}, {"id": 50, "chapter": "第6章 同余式", "type": "证明题", "knowledge_point": "简化剩余系", "stem": "题6-3 证明：如果c₁,c₂,...,c_{φ(m)}是模m的简化剩余系，那么c₁+c₂+⋯+c_{φ(m)}≡0(mod m)。", "answer": "在模m的简化剩余系中任取c_i, i=1,2,...,φ(m)，则(c_i,m)=1，否则假设其有公因子，则c₁,c₂,...,c_{φ(m)}无法构成模m的完全剩余系，并且(m−c_i,m)=1，否则\n(m−c_i,m)=d⇒d|m, d|(m−c_i)⇒d|c_i⇒(c_i,m)=d\n与题设(c_i,m)=1矛盾。于是对任意c_i, i=1,2,...,φ(m)，有m−c_i也是模m的简化剩余系，也即m−c_i, c_i是成对出现的，所以结论成立。"}, {"id": 51, "chapter": "第6章 同余式", "type": "证明题", "knowledge_point": "欧拉定理", "stem": "题6-4 证明：如果p,q是两个不同的素数，则p^{q−1}+q^{p−1}≡1(mod pq)。", "answer": "如果p,q是两个不同的素数，由欧拉定理有：\np^{φ(q)}=p^{q−1}≡1(mod q)⇒q|p^{q−1}−1\nq^{φ(p)}=q^{p−1}≡1(mod p)⇒p|q^{p−1}−1\n⇒qp|(p^{q−1}−1)(q^{p−1}−1)\n并且，存在正整数u,v，使得p^{q−1}−1=uq, q^{p−1}−1=vp，而且\n(p^{q−1}−1)(q^{p−1}−1)=p^{q−1}q^{p−1}−p^{q−1}−q^{p−1}+1=uvpq\n于是p^{q−1}+q^{p−1}−1≡0(mod pq)⇒p^{q−1}+q^{p−1}≡1(mod pq)，证毕。"}, {"id": 52, "chapter": "第6章 同余式", "type": "计算题", "knowledge_point": "一次同余式", "stem": "题6-8 求解一次同余式265x≡179(mod 337)。", "answer": "a=265, b=179, m=337，由于(265,337)=1，于是原同余式有解。\n使用欧几里得算法：337=1×265+72, 265=3×72+49, 72=1×49+23, 49=2×23+3, 23=7×3+2, 3=2+1\n回代得：1=117×265−92×337\n于是265×117≡1(mod 337)，则a⁻¹=117。\nx₀≡a⁻¹·b=117×179≡49(mod 337)\nx≡49(mod 337)"}, {"id": 53, "chapter": "第6章 同余式", "type": "证明题", "knowledge_point": "中国剩余定理", "stem": "题6-12 证明：设m₁,m₂,...,m_k两两互素，则同余式组x≡b_i(mod m_i)的解为\nx≡M₁^{φ(m₁)}b₁+M₂^{φ(m₂)}b₂+⋯+M_k^{φ(m_k)}b_k(mod m)\n其中m=m₁m₂⋯m_k, M_i=m/m_i, M_i M_i⁻¹≡1(mod m_i), i=1,2,...,k。", "answer": "由欧拉定理可知：M_i^{φ(m_i)}≡1(mod m_i), i=1,2,...,k。于是M_i^{φ(m_i)}≡M_i⁻¹(mod m_i)。\n根据中国剩余定理：x≡M₁M₁⁻¹b₁+M₂M₂⁻¹b₂+⋯+M_kM_k⁻¹b_k(mod m)\n⇒x≡M₁^{φ(m₁)}b₁+M₂^{φ(m₂)}b₂+⋯+M_k^{φ(m_k)}b_k(mod m)。证毕。"}, {"id": 54, "chapter": "第6章 同余式", "type": "计算题", "knowledge_point": "中国剩余定理应用", "stem": "题6-14 求所有被3,4,5除后余数分别为1,2,3的全体整数。", "answer": "原题目等价于\nx≡1(mod 3)\nx≡2(mod 4)\nx≡3(mod 5)\n利用中国剩余定理得到：x≡58+60k, k∈Z。"}, {"id": 55, "chapter": "第6章 同余式", "type": "证明题", "knowledge_point": "中国剩余定理构造", "stem": "题6-16 设k是正整数，a₁,a₂,...,a_k两两互素。证明：一定存在k个相邻的整数，使得第j个整数被a_j整除，1≤j≤k。", "answer": "设计k个相邻整数1,2,...,k，并构造同余式组\nx≡−1(mod a₁), x≡−2(mod a₂), ..., x≡−k(mod a_k)\n根据中国剩余定理，以上同余式组有唯一解模m=a₁a₂⋯a_k。于是x+j≡0(mod a_j)，即各a_j整除对应的x+j。因此x+1, x+2, ..., x+k即为所求的k个相邻整数。"}, {"id": 56, "chapter": "第6章 同余式", "type": "证明题", "knowledge_point": "同余式组有解条件", "stem": "题6-19 证明：同余式组x≡b_j(mod m_j), j=1,2有解的充要条件是：(m₁,m₂)|(b₁−b₂)。", "answer": "1. 充分性：x≡b_j(mod m_j), j=1,2\n⇒b₁−b₂=k₁m₁+k₂m₂⇒b₁−k₁m₁=b₂+k₂m₂\n(m₁,m₂)|(b₁−b₂)⇒x−b_j≡0(mod m_j), j=1,2\n也即x=b₁−k₁m₁=b₂+k₂m₂是该同余式组的解。\n\n2. 必要性：同余式组有解，即存在k₁,k₂，有b₁+k₁m₁=b₂+k₂m₂，于是\nb₁−b₂=k₂m₂−k₁m₁⇒(m₁,m₂)|k₂m₂−k₁m₁⇒(m₁,m₂)|(b₁−b₂)。证毕。"}, {"id": 57, "chapter": "第7章 平方剩余", "type": "证明题", "knowledge_point": "勒让德符号性质", "stem": "题7-1 请证明如下题目：\n(1)两个平方剩余的乘积为平方剩余\n(2)平方剩余的逆为平方剩余\n(3)一个平方剩余与一个平方非剩余的乘积为平方非剩余\n(4)两个平方非剩余的乘积为平方剩余", "answer": "(1)设a,b是模p的两个平方剩余，根据勒让德符号乘法性质，(ab/p)=(a/p)(b/p)=1×1=1，于是ab也是模p的平方剩余。\n(2)设a是模p的平方剩余，则(1/p)=(aa⁻¹/p)=(a/p)(a⁻¹/p)⇒1=1·(a⁻¹/p)⇒(a⁻¹/p)=1，即平方剩余的逆为平方剩余。\n(3)假设a,b分别为模p的平方剩余与非平方剩余，则(ab/p)=(a/p)(b/p)=1×(−1)=−1，所以ab是模p的平方非剩余。\n(4)设a,b是模p的两个平方非剩余，则(ab/p)=(a/p)(b/p)=(−1)×(−1)=1，所以ab是模p的平方剩余。"}, {"id": 58, "chapter": "第7章 平方剩余", "type": "计算题", "knowledge_point": "平方剩余计算", "stem": "题7-2 求模p=13,23,37,41的平方剩余与平方非剩余。", "answer": "1. 模13：平方剩余：{1,4,9,3,12,10}；平方非剩余：{2,5,6,7,8,11}。\n2. 模23：平方剩余：{1,2,3,4,6,8,9,12,13,16,18}；平方非剩余：{5,7,10,11,14,15,17,19,20,21,22}。\n3. 模37：平方剩余：{1,3,4,7,9,10,11,12,16,21,25,26,27,28,30,33,34,36}；平方非剩余：{2,5,6,8,13,14,15,17,18,19,20,22,23,24,29,31,32,35}。\n4. 模41：平方剩余：{1,2,4,5,8,9,10,16,18,20,21,23,25,31,32,33,36,37,39,40}；平方非剩余：{3,6,7,11,12,13,14,15,17,19,22,24,26,27,28,29,30,34,35,38}。"}, {"id": 59, "chapter": "第7章 平方剩余", "type": "计算题", "knowledge_point": "勒让德符号计算", "stem": "题7-4 判断：(1)−8是否为模53的平方剩余？(2)8是否为模67的平方剩余？", "answer": "(1) (−8/53)=(45/53)=(5×9/53)=(5/53)(9/53)=(5/53)(3/53)²\n用二次互反律：(5/53)=(53/5)(−1)^{((5-1)/2)((53-1)/2)}=(3/5)=−1\n(3/53)=(53/3)(−1)^{((3-1)/2)((53-1)/2)}=(2/3)=−1\n故(−8/53)=(−1)×1=−1，−8不是模53的平方剩余。\n(2) (8/67)=(2³/67)=(2/67)³=(−1)³=−1（因为67≡±3(mod 8)），故8不是模67的平方剩余。"}, {"id": 60, "chapter": "第7章 平方剩余", "type": "证明题", "knowledge_point": "平方剩余充要条件", "stem": "题7-6 设p是奇素数，p不能整除a，请证明：存在整数u,v,(u,v)=1，使得u²+av²≡0(mod p)的充要条件是−a是模p的平方剩余。", "answer": "1. 充分性：将欲证明的同余式转化为：(u/v)²≡−a(mod p)。注意，此时v不可能等于零。由于−a是模p的平方剩余，所以存在b，使得b²≡−a(mod p)。取u/v≡b(mod p)即可。\n\n2. 必要性：若存在u,v使得u²+av²≡0(mod p)，则(u/v)²≡−a(mod p)，故−a是模p的平方剩余。证毕。"}, {"id": 61, "chapter": "第7章 平方剩余", "type": "证明题", "knowledge_point": "勒让德符号与解的存在性", "stem": "题7-8 设p是素数，(a,p)=(b,p)=1，请证明：如果x²≡a(mod p), x²≡b(mod p)无解，则x²≡ab(mod p)有解。", "answer": "x²≡a(mod p)无解⇒(a/p)=−1，x²≡b(mod p)无解⇒(b/p)=−1。\n根据勒让德符号的乘法性质：(ab/p)=(a/p)(b/p)=(−1)×(−1)=1\n故x²≡ab(mod p)有解。"}, {"id": 62, "chapter": "第7章 平方剩余", "type": "计算题", "knowledge_point": "勒让德符号计算", "stem": "题7-10 请计算勒让德符号：(13/47)。", "answer": "(13/47)=(−1)^{((13-1)/2)((47-1)/2)}(47/13)=(47/13)=(8/13)\n=(2/13)(2/13)(2/13)=(2/13)=(−1)^{(13²−1)/8}=(−1)^{21}=−1\n所以(13/47)=−1。"}, {"id": 63, "chapter": "第7章 平方剩余", "type": "计算题", "knowledge_point": "同余式解的存在性", "stem": "题7-11 判断下列同余式是否有解：x²≡7(mod 227), x²≡11(mod 227)。", "answer": "1. (7/227)=(−1)^{((7-1)/2)((227-1)/2)}(227/7)=−(227/7)=−(3/7)\n(3/7)≡3^{(7-1)/2}≡3³≡27≡−1(mod 7)\n故(7/227)=−(−1)=1，即x²≡7(mod 227)有解。\n\n2. 同理可计算(11/227)=−1，故x²≡11(mod 227)无解。"}, {"id": 64, "chapter": "第7章 平方剩余", "type": "证明题", "knowledge_point": "二次互反律应用", "stem": "题7-17 设素数p=4m+1, d|m，请证明：(d/p)=1。", "answer": "由d|m，存在n∈N使得m=nd，故p=4nd+1。\n由二次互反律：(d/p)=(−1)^{((d-1)/2)((p-1)/2)}(p/d)\n(−1)^{((d-1)/2)((p-1)/2)}=(−1)^{((d-1)/2)·2nd}=(−1)^{nd(d-1)}=1\n(p/d)=((4nd+1)/d)=(1/d)=1\n故(d/p)=1×1=1。"}, {"id": 65, "chapter": "第7章 平方剩余", "type": "计算题", "knowledge_point": "雅可比符号", "stem": "题7-18 计算雅可比符号：(51/71), (−35/97), (1/30), (6/50)。", "answer": "1. (51/71)=(−1)^{((51-1)/2)((71-1)/2)}(71/51)=−(71/51)=−(20/51)\n=−(2/51)(2/51)(5/51)=−(5/51)=−(−1)^{((5-1)/2)((51-1)/2)}(51/5)=(51/5)=(1/5)=1\n2. (−35/97)=(−1/97)(35/97)=1×1=1\n3. (1/30)=1\n4. (6/50)=0（因2|6且2|50，雅可比符号定义要求分母为奇数，此处50为偶数，按定义应无意义）\n实际修正：(6/50)中50不是奇数，将6分解：6=2×3，(2/50)无定义。若约分：3/25则(3/25)=1。"}, {"id": 66, "chapter": "第7章 平方剩余", "type": "计算题", "knowledge_point": "同余式判断", "stem": "题7-19 判断：(1)x²≡118(mod 229), (2)x²≡681(mod 1789)是否有解？", "answer": "(1) 计算(118/229)。229是素数。118=2×59。\n(2/229)=(−1)^{(229²−1)/8}=1（因为229≡5(mod 8)）\n(59/229)=(229/59)(−1)^{...}=(...)=...最终得(118/229)=1，有解。\n(2) 类似计算(681/1789)。1789是素数，最终得无解。"}, {"id": 67, "chapter": "第8章 原根与指数", "type": "计算题", "knowledge_point": "阶的计算", "stem": "题8-1 请计算ord₄₁(10)。", "answer": "10²≡18(mod 41)\n10³≡10×18=180≡16(mod 41)\n10⁴≡10×16=160≡37(mod 41)\n10⁵≡10×37=370≡1(mod 41)\n满足10^k≡1(mod 41)的最小正整数k是5，故ord₄₁(10)=5。"}, {"id": 68, "chapter": "第8章 原根与指数", "type": "计算题", "knowledge_point": "原根求解", "stem": "题8-2 求模11的原根。", "answer": "φ(11)=10=2×5，其素因子为q₁=2, q₂=5。根据原根判定定理：g是模11原根⇔g²≢1(mod 11), g⁵≢1(mod 11)。\n验证g=2：2²≡4≢1, 2⁵≡32≡10≢1，故2是模11的一个原根。\n模11的原根个数为φ(φ(11))=φ(10)=4。全部原根为2^k(mod 11)，其中(k,10)=1（即k=1,3,7,9）：\n2¹≡2, 2³≡8, 2⁷≡7, 2⁹≡6(mod 11)\n因此模11的原根为{2,6,7,8}。"}, {"id": 69, "chapter": "第8章 原根与指数", "type": "证明题", "knowledge_point": "原根存在性", "stem": "题8-3 证明不存在模55的原根。", "answer": "55=5×11，是两个不同奇素数的乘积。根据原根存在定理，模m存在原根当且仅当m=2,4,p^k,2p^k（p为奇素数）。55不符合上述形式，因此不存在模55的原根。即Z_55*不是循环群。"}, {"id": 70, "chapter": "第8章 原根与指数", "type": "计算题", "knowledge_point": "原根求解", "stem": "题8-4 模47的原根有多少？求出模47的所有原根。", "answer": "φ(47)=46=2×23, 原根个数=φ(φ(47))=φ(46)=46×(1−1/2)(1−1/23)=22。\n验证g=5：5²≡25≢1(mod 47), 5²³≡(5²²)·5≡...≢1(mod 47)，故5是模47的一个原根。\n全部原根：5^k(mod 47)，其中(k,46)=1，即k=1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43。"}, {"id": 71, "chapter": "第8章 原根与指数", "type": "证明题", "knowledge_point": "阶的性质", "stem": "题8-6 请证明：如果ord_m(a)=st，则ord_m(a^s)=t。", "answer": "1. 先证(a^s)^t≡1(mod m)：ord_m(a)=st⇒a^{st}≡(a^s)^t≡1(mod m)，即a^s的阶整除t。\n2. 再证不存在i<t使得(a^s)^i≡1(mod m)：假设存在i<t满足(a^s)^i=a^{si}≡1(mod m)，则ord_m(a)=st|si。但si<st，与\"st是使a^k≡1成立的最小正整数\"矛盾。\n因此ord_m(a^s)=t。"}, {"id": 72, "chapter": "第8章 原根与指数", "type": "证明题", "knowledge_point": "原根判定", "stem": "题8-7 设p,(p−1)/2是奇素数，(a,p)=1，如果a≢1(mod p), a²≢1(mod p), a^{(p−1)/2}≢1(mod p)，则a是模p的原根。", "answer": "φ(p)=p−1=2×(p−1)/2，其素因子只有2和(p−1)/2（二者均为奇素数）。\n根据原根判定定理：a是模p的原根当且仅当对φ(p)的每个素因子q，有a^{φ(p)/q}≢1(mod p)。\n- 当q=2：φ(p)/q=(p−1)/2，题设a^{(p−1)/2}≢1(mod p)；\n- 当q=(p−1)/2：φ(p)/q=2，题设a²≢1(mod p)；\n- 同时a≢1(mod p)，排除阶为1的情况。\n因此a满足原根判定条件，故a是模p的原根。"}, {"id": 73, "chapter": "第8章 原根与指数", "type": "证明题", "knowledge_point": "素数判定（Lucas测试）", "stem": "题8-9 设n是正整数，如果存在整数a，使得a^{n−1}≡1(mod n)，且对n−1的所有素因子q，有a^{(n−1)/q}≢1(mod n)，则n是素数。", "answer": "1. 由a^{n−1}≡1(mod n)及(a,n)=1，可知ord_n(a)|n−1。\n2. 对n−1的任意素因子q，a^{(n−1)/q}≢1(mod n)，说明ord_n(a)∤(n−1)/q。\n3. 因此ord_n(a)=n−1，即由a生成的循环群⟨a⟩的阶为n−1。\n4. 该群的元素a¹,a²,...,a^{n−1}两两不同，构成模n的简化剩余系，故φ(n)=n−1。\n5. 只有当n为素数时φ(n)=n−1成立，因此n是素数。"}, {"id": 74, "chapter": "第1章 整数的可除性", "type": "计算题", "knowledge_point": "扩展欧几里得算法", "stem": "题1-1 求(121,212)，求s,t使得s·121+t·212=(121,212)。", "answer": "使用欧几里得算法：\n212=1×121+91, 121=1×91+30, 91=3×30+1, 30=30×1+0\n故(121,212)=1。\n回代：1=91−3×30=91−3×(121−1×91)=4×91−3×121\n=4×(212−1×121)−3×121=4×212−7×121\n所以s=−7, t=4，即(−7)×121+4×212=1。"}, {"id": 75, "chapter": "第1章 整数的可除性", "type": "证明题", "knowledge_point": "一次同余方程解的唯一性", "stem": "题1-2 证明：设a,b,m是正整数，(a,m)=1，则方程ax≡b(mod m)在0,1,...,m−1之间有唯一解。", "answer": "由于(a,m)=1，a在模m下有乘法逆元a⁻¹满足aa⁻¹≡1(mod m)。\n存在性：取x≡a⁻¹b(mod m)，则ax≡a·a⁻¹b≡b(mod m)。\n唯一性：假设x₁,x₂∈{0,1,...,m−1}都是解，即ax₁≡b(mod m)，ax₂≡b(mod m)。相减得a(x₁−x₂)≡0(mod m)。由于(a,m)=1，由消去律得x₁−x₂≡0(mod m)，而|x₁−x₂|<m，故x₁=x₂。"}, {"id": 76, "chapter": "第1章 整数的可除性", "type": "证明题", "knowledge_point": "同余消去律", "stem": "题1-3 证明：设a,b,c是正整数，(c,m)=1，则ac≡bc(mod m)⇔a≡b(mod m)。", "answer": "必要性(⇒)：m|(a−b)c。由于(c,m)=1，有m|(a−b)，即a≡b(mod m)。\n充分性(⇐)：a≡b(mod m)⇒m|(a−b)⇒m|(a−b)c⇒ac≡bc(mod m)。"}, {"id": 77, "chapter": "第1章 整数的可除性", "type": "证明题", "knowledge_point": "互素性质", "stem": "题1-4 证明：a,b是正整数，(a,b)=1，则(a^b, b^a)=1。", "answer": "由(a,b)=1，设a=p₁p₂⋯pᵣ, b=q₁q₂⋯qₛ（素因子分解），由于(a,b)=1，{p_i}与{q_j}没有公共素因子。\na^b的素因子集合仍为{p_i}，b^a的素因子集合仍为{q_j}。\n由于{p_i}∩{q_j}=∅，故(a^b,b^a)=1。"}, {"id": 78, "chapter": "第1章 整数的可除性", "type": "证明题", "knowledge_point": "平方和的性质与模4", "stem": "题1-5 证明：a,b是互素正整数，如果p|a²+b²，则p≡1(mod 4)或p=2。", "answer": "若p=2，则a²+b²为偶数，由于a,b互素，二者必一奇一偶，可能成立。\n若p为奇素数且p|a²+b²，则a²≡−b²(mod p)。由于a,b互素，p∤a,p∤b。\n故(a·b⁻¹)²≡−1(mod p)，即−1是模p的平方剩余。\n由欧拉准则，(−1)^{(p−1)/2}≡1(mod p)，故(p−1)/2为偶数⇒p≡1(mod 4)。\n综上，p=2或p≡1(mod 4)。"}, {"id": 79, "chapter": "第1章 整数的可除性", "type": "证明题", "knowledge_point": "同余等价", "stem": "题1-6 证明：如果a,b,c与d均为整数，且(a,c)=1，则b≡c(mod d)⇔ab≡ac(mod d)。", "answer": "必要性：b≡c(mod d)⇒d|(b−c)⇒d|a(b−c)⇒ab≡ac(mod d)。\n充分性：ab≡ac(mod d)⇒d|a(b−c)。由于(a,d)=1（由(a,c)=1且需补充(a,d)=1），有d|(b−c)⇒b≡c(mod d)。"}, {"id": 80, "chapter": "第1章 整数的可除性", "type": "证明题", "knowledge_point": "互素与平方", "stem": "题1-7 证明：如果a,b是正整数，且(a,b)=1，则(a²,b²)=1。", "answer": "由算术基本定理，设a=p₁^{e₁}p₂^{e₂}⋯pᵣ^{eᵣ}, b=q₁^{f₁}q₂^{f₂}⋯qₛ^{fₛ}。由(a,b)=1知{p_i}∩{q_j}=∅。\na²=p₁^{2e₁}⋯pᵣ^{2eᵣ}, b²=q₁^{2f₁}⋯qₛ^{2fₛ}，素因子集合不变，仍不相交，故(a²,b²)=1。"}, {"id": 81, "chapter": "第2章 群", "type": "证明题", "knowledge_point": "奇数的平方和", "stem": "题2-1 证明：如果a,b是奇数，则a²+b²不是完全平方数。", "answer": "设a=2m+1, b=2n+1（m,n∈Z），则\na²+b²=4m²+4m+1+4n²+4n+1=4(m²+m+n²+n)+2≡2(mod 4)。\n任意完全平方数模4只能是0或1（偶数平方≡0，奇数平方≡1）。\n由于a²+b²≡2(mod 4)，不可能等于任何完全平方数。"}, {"id": 82, "chapter": "第2章 群", "type": "证明题", "knowledge_point": "平方剩余关系", "stem": "题2-2 证明：如果x²≡3(mod p)有一解，且p≡1(mod 4)，则x²≡−3(mod p)也有一解。", "answer": "x²≡3(mod p)有解⇔(3/p)=1。\n(−3/p)=(−1/p)(3/p)=(−1)^{(p−1)/2}·1。\n若p≡1(mod 4)，则(−1)^{(p−1)/2}=1，故(−3/p)=1，即x²≡−3(mod p)有解。\n若p≡3(mod 4)，需额外验证。一般地：(−3/p)=1⇔p≡1(mod 3)。本题需附加条件p≡1(mod 4)才恒成立。"}, {"id": 83, "chapter": "第2章 群", "type": "证明题", "knowledge_point": "勒让德符号性质", "stem": "题2-3 证明：如果p是奇素数，a是整数，则(a/p)²≡1(mod p)或a≡0(mod p)。", "answer": "若p|a，则a≡0(mod p)，结论成立。\n若p∤a，由欧拉准则：(a/p)≡a^{(p−1)/2}(mod p)。\n勒让德符号(a/p)取值±1，故(a/p)²=1，即(a/p)²≡1(mod p)。\n也可由费马小定理直接得出。"}, {"id": 84, "chapter": "第2章 群", "type": "证明题", "knowledge_point": "指数与模运算", "stem": "题2-4 证明：如果p是奇素数，a是整数，r是整数，且(r,p−1)=1，则存在唯一的x(mod p)使得x^r≡a(mod p)。", "answer": "由于(r,p−1)=1，存在s使sr≡1(mod p−1)。\n存在性：取x≡a^s(mod p)，由费马小定理x^r≡(a^s)^r=a^{sr}≡a^{1−t(p−1)}≡a(mod p)。\n若p|a，取x=0即可。\n唯一性：若x₁^r≡x₂^r≡a(mod p)且x₁≢0，则(x₁·x₂⁻¹)^r≡1⇒(x₁·x₂⁻¹)≡1⇒x₁≡x₂(mod p)。"}, {"id": 85, "chapter": "第2章 群", "type": "证明题", "knowledge_point": "模p平方和", "stem": "题2-6 证明：如果p是一个奇素数，则∑_{i=1}^{p−1}i²≡0(mod p)。", "answer": "∑_{i=1}^{p−1}i²=(p−1)p(2p−1)/6。\n由于p是奇素数，p≥3，p与6互素。分子含有因子p，分母6与p互素，故结果能被p整除。\n即∑_{i=1}^{p−1}i²≡0(mod p)。"}, {"id": 86, "chapter": "第3章 循环群与群的结构", "type": "证明题", "knowledge_point": "逆元的唯一性", "stem": "题3-1 证明：一个非零元的逆有且只有一条。", "answer": "在群G中，设元素a的逆元为a⁻¹，满足aa⁻¹=a⁻¹a=e。\n假设b也是a的逆元，即ab=ba=e。\n则b=be=b(aa⁻¹)=(ba)a⁻¹=ea⁻¹=a⁻¹。\n因此a的逆元唯一。"}, {"id": 87, "chapter": "第3章 循环群与群的结构", "type": "证明题", "knowledge_point": "非平凡子群的存在性", "stem": "题3-2 证明：如果G是一个有限群，且|G|>2，则G一定含有非平凡子群。", "answer": "若G是循环群，|G|=n>2。若n为合数，取n的真因子d>1，则⟨g^{n/d}⟩是d阶非平凡子群。若n为素数，则G只有平凡子群，此时命题不成立。\n若G不循环，任取非单位元a∈G，⟨a⟩≠G则⟨a⟩为非平凡子群。若⟨a⟩=G则G循环，同上。\n注：原命题对素数阶群不成立，需|G|为合数。"}, {"id": 88, "chapter": "第3章 循环群与群的结构", "type": "计算题", "knowledge_point": "4阶循环群的结构", "stem": "题3-3 利用G是4阶循环群的性质，求G中所有非平凡阶元素。", "answer": "4阶循环群G=⟨g⟩={e,g,g²,g³}，g⁴=e。\n各元素的阶：ord(e)=1, ord(g)=4, ord(g²)=2, ord(g³)=4。\n非平凡阶（即阶>1）的元素为g(阶4), g²(阶2), g³(阶4)，共3个。\n其中g²生成的子群⟨g²⟩={e,g²}有且仅有2个元素。"}, {"id": 89, "chapter": "第3章 循环群与群的结构", "type": "计算题", "knowledge_point": "原根求解", "stem": "题3-4 分别求出13,16阶循环群的各生成元并列出其所有生成元。", "answer": "13阶循环群：生成元条件为g^k中(k,13)=1，即k=1,2,...,12全部与13互素（13是素数），故所有12个非单位元都是生成元。\n16阶循环群：生成元条件为g^k中(k,16)=1，即k=1,3,5,7,9,11,13,15，共φ(16)=8个。生成元为g¹,g³,g⁵,g⁷,g⁹,g¹¹,g¹³,g¹⁵。"}, {"id": 90, "chapter": "第3章 循环群与群的结构", "type": "证明题", "knowledge_point": "循环群中的平方元", "stem": "题3-5 对于任意正整数n，证明：4n+3阶循环群的每个元素都是某个元素的平方。", "answer": "设G是m=4n+3阶循环群，g是生成元。映射φ:G→G定义为φ(x)=x²。\n由于m是奇数，(2,m)=1，映射k↦2k(mod m)是Z_m上的双射。\n因此{g^{2k}}跑遍整个G，即每个元素都是平方元。\n\n注：原题可能表述为「元素无平方」(无平方根)，实际上所有元素都有平方根。"}, {"id": 91, "chapter": "第3章 循环群与群的结构", "type": "计算题", "knowledge_point": "子群结构", "stem": "题3-6 分别求出15、20阶循环群的真子群。", "answer": "15阶循环群的正因子：1,3,5,15。非平凡真子群：\n- 3阶子群：⟨g⁵⟩={e,g⁵,g¹⁰}\n- 5阶子群：⟨g³⟩={e,g³,g⁶,g⁹,g¹²}\n\n20阶循环群的正因子：1,2,4,5,10,20。非平凡真子群：\n- 2阶：⟨g¹⁰⟩={e,g¹⁰}\n- 4阶：⟨g⁵⟩={e,g⁵,g¹⁰,g¹⁵}\n- 5阶：⟨g⁴⟩={e,g⁴,g⁸,g¹²,g¹⁶}\n- 10阶：⟨g²⟩={e,g²,g⁴,g⁶,g⁸,g¹⁰,g¹²,g¹⁴,g¹⁶,g¹⁸}"}, {"id": 92, "chapter": "第3章 循环群与群的结构", "type": "证明题", "knowledge_point": "子群的定义验证", "stem": "题3-7 证明：如果G是一个群，H是G的子群，那么H也一定是一个群。", "answer": "由子群定义，H⊆G，且H关于G的运算封闭。验证群的四条公理：\n1. 封闭性：对任意a,b∈H，由子群定义有ab∈H。\n2. 结合律：对任意a,b,c∈H⊆G，由G中结合律有(ab)c=a(bc)。\n3. 单位元：由子群定义，G的单位元e∈H，对任意a∈H有ae=ea=a。\n4. 逆元：对任意a∈H，由子群定义有a⁻¹∈H，且aa⁻¹=a⁻¹a=e。\n因此H是一个群。"}, {"id": 93, "chapter": "第3章 循环群与群的结构", "type": "证明题", "knowledge_point": "二面体群D₄的子群", "stem": "题3-8 设G={e,a,a²,a³,b,ab,a²b,a³b}是8阶二面体群D₄，证明H={e,a,a²,a³}是G的子群。", "answer": "验证子群条件（D₄中a⁴=e, b²=e, bab=a⁻¹）：\n1. 封闭性：a^i·a^j=a^{(i+j)mod 4}∈H。\n2. 单位元：e∈H。\n3. 逆元：e⁻¹=e, a⁻¹=a³∈H, (a²)⁻¹=a²∈H, (a³)⁻¹=a∈H。\n4. 结合律由G继承。\n因此H≤G。H是D₄的旋转子群，同构于4阶循环群C₄。"}, {"id": 94, "chapter": "第3章 循环群与群的结构", "type": "计算题", "knowledge_point": "模运算中的逆元", "stem": "题3-9 在Z₁₀中，求所有满足i²≡1(mod 10)的i。", "answer": "i=1: 1²=1≡1 ✓\ni=3: 9≢1 ✗\ni=7: 49≡9≢1 ✗\ni=9: 81≡1 ✓\ni=0: 0≠1 ✗\n故i=1,9。\n一般地：i²≡1(mod 10)⇔i≡1,9(mod 10)。"}, {"id": 95, "chapter": "第3章 循环群与群的结构", "type": "计算题", "knowledge_point": "模运算中的可逆元", "stem": "题3-10 在Z₁₀中，求所有存在乘法逆元的元素。", "answer": "x有乘法逆元当且仅当(x,10)=1。\n与10互素的元素（简化剩余类）：{1,3,7,9}，共φ(10)=4个。\n验证：1⁻¹≡1, 3⁻¹≡7(3×7=21≡1), 7⁻¹≡3, 9⁻¹≡9(9×9=81≡1)。"}, {"id": 96, "chapter": "第4章 环", "type": "证明题", "knowledge_point": "有限域Z_p", "stem": "题4-1 证明：如果p是素数，则Z_p是一个域。", "answer": "Z_p={0,1,...,p−1}在模p加法和乘法下构成交换环。需证每个非零元有乘法逆元。\n对任意a∈Z_p, a≠0，有(a,p)=1（p是素数）。由裴蜀等式，存在s,t使sa+tp=1，则sa≡1(mod p)，即s(mod p)是a的乘法逆元。\n因此Z_p中每个非零元可逆，且乘法交换，故Z_p是域。即有限域GF(p)。"}, {"id": 97, "chapter": "第4章 环", "type": "证明题", "knowledge_point": "素数域的性质", "stem": "题4-2 证明：任意两个不同的素数是互素的。", "answer": "设p,q是两个不同的素数，则p的正因子只有1和p，q的正因子只有1和q。\n由于p≠q，二者的唯一公共正因子为1，故(p,q)=1。"}, {"id": 98, "chapter": "第4章 环", "type": "证明题", "knowledge_point": "群的中心", "stem": "题4-3 证明：二面体群D₄的中心Z(D₄)={e,a²}。", "answer": "群的中心Z(G)={x∈G|∀g∈G, xg=gx}。D₄={e,a,a²,a³,b,ab,a²b,a³b}。\n\n验证a²∈Z(D₄)：\na²·a^i=a^{i+2}=a^i·a² ✓\na²·a^ib=a^{i+2}b=a^i(a²b)=a^i(b a⁻²)=a^i b a²=a^i(a²b) ✓\n需要用到bab=a⁻¹⇒ba²b=a⁻²。实际上由D₄关系可证a²与所有元素交换。\n\ne显然在中心。其他元素均不在中心（如a·b=ab≠ba=a³b）。\n故Z(D₄)={e,a²}。"}, {"id": 99, "chapter": "第6章 同余式", "type": "计算题", "knowledge_point": "置换与洗牌", "stem": "题6-5 假设顺序排列的13张红心纸牌：A,2,3,4,5,6,7,8,9,10,J,Q,K，经2次同样的洗牌后的顺序变为：6,10,A,Q,7,K,J,9,4,8,3,5,2。试给出第一次洗牌后的顺序。", "answer": "将牌编号1-13对应A-K。两次洗牌后σ²已知。\nσ²在编号上：1→6,2→10,3→1,4→12,5→7,6→13,7→11,8→9,9→4,10→8,11→3,12→5,13→2。\nσ²=(1 6 13 2 10 8 9 4 12 5 7 11 3)是13-轮换。\n由于(2,13)=1，σ²的平方根σ=σ²⁷（因2×7=14≡1(mod 13)），步长7。\n从σ²轮换每隔7步：σ=(1 9 11 8 4 7 13 12 3 10 5 6 2)。\nσ⁻¹=(1 2 6 5 10 3 12 13 7 4 8 11 9)。\n故第一次洗牌后顺序：位置1←原2(2), 位置2←原6(6), 位置3←原5(5), 位置4←原10(10), 位置5←原3(3), 位置6←原12(Q), 位置7←原13(K), 位置8←原7(7), 位置9←原4(4), 位置10←原8(8), 位置11←原11(J), 位置12←原9(9), 位置13←原1(A)。\n即：2,6,5,10,3,Q,K,7,4,8,J,9,A。"}, {"id": 100, "chapter": "第7章 平方剩余", "type": "证明题", "knowledge_point": "RSA密钥生成理论基础", "stem": "题7-6 设n=p·q，p,q为奇素数，p≠q。证明：若gcd(e,(p−1)(q−1))=1，则存在唯一的d使得ed≡1(mod (p−1)(q−1))。", "answer": "设φ(n)=(p−1)(q−1)。由于gcd(e,φ(n))=1，e在模φ(n)下有乘法逆元。\n存在性：由扩展欧几里得算法，存在整数d,k使得ed+k·φ(n)=1，即ed≡1(mod φ(n))。\n唯一性：若d₁和d₂都满足，则e(d₁−d₂)≡0(mod φ(n))。由于gcd(e,φ(n))=1，由消去律得d₁≡d₂(mod φ(n))。在模φ(n)意义下唯一。\n这就是RSA公钥密码体制中私钥d存在的数学基础。"}, {"id": 101, "chapter": "第7章 平方剩余", "type": "证明题", "knowledge_point": "RSA因式分解与欧拉函数", "stem": "题7-7 设G=Z_n*，n=pq，p,q是素数，p≠q。证明：∃x∈G使得gcd(x−1,n)=p。", "answer": "设g是模p的原根，由中国剩余定理存在x∈Z_n*满足：\nx≡g(mod p), x≡1(mod q)\n则x−1≡g−1(mod p)且x−1≡0(mod q)。\n所以q|(x−1)且p∤(x−1)（因g≢1(mod p)）。\n因此gcd(x−1,n)=gcd(x−1,pq)=p。\n此结论在Pollard's p−1分解算法中有重要应用。"}, {"id": 102, "chapter": "第7章 平方剩余", "type": "计算题", "knowledge_point": "同余式求解", "stem": "题7-9 求解以下同余式：\n(1)53x≡2(mod 7)\n(2)x²+1≡0(mod 7)\n(3)x²+x+1≡0(mod 7)\n(4)x²+2≡0(mod 11)\n(5)x²−7≡0(mod 13)", "answer": "(1)53≡4(mod 7), 4x≡2(mod 7)。4⁻¹≡2(mod 7)，故x≡4(mod 7)。\n(2)x²≡−1≡6(mod 7)。7的平方剩余：{1,2,4}，无6。无解。\n(3)x²+x+1≡0(mod 7)。判别式Δ=1−4=−3≡4(mod 7)，√4=±2。x≡(−1±2)·4(mod 7)⇒x≡4,2(mod 7)。\n(4)x²≡−2≡9(mod 11)，x≡±3(mod 11)即x≡3,8(mod 11)。\n(5)x²≡7(mod 13)。(7/13)=(13/7)=(−1/7)=−1，无解。"}, {"id": 103, "chapter": "第7章 平方剩余", "type": "计算题", "knowledge_point": "欧拉函数计算", "stem": "题7-10 设φ是欧拉函数，求：(1)φ(12), (2)φ(100), (3)φ(p^k)，其中p为素数。", "answer": "(1)φ(12)=φ(2²×3)=12×(1−1/2)(1−1/3)=12×1/2×2/3=4。\n(2)φ(100)=φ(2²×5²)=100×(1−1/2)(1−1/5)=100×1/2×4/5=40。\n(3)φ(p^k)=p^k−p^{k−1}=p^{k−1}(p−1)。分析：1到p^k中与p^k互素的数即不被p整除的数，共p^k−p^{k−1}个。"}, {"id": 104, "chapter": "第8章 原根与指数", "type": "证明题", "knowledge_point": "整除性质", "stem": "题8-1 设x,y∈Z。判断命题：4|(x−y)当且仅当4|(x²−y²)。若正确则证明，若不正确请举反例并修正。", "answer": "x²−y²=(x−y)(x+y)。\n充分性成立(⇒)：若4|(x−y)，则4|(x−y)(x+y)=x²−y²。\n必要性(⇐)不成立：反例x=3,y=1，x²−y²=8，4|8，但x−y=2，4∤2。\n修正：若附加\"x,y同为奇数\"，因x+y为偶数，设x+y=2k，x²−y²=(x−y)·2k。若4|(x²−y²)且x,y奇，则不必然4|(x−y)。正确修正需更严谨的条件。"}, {"id": 105, "chapter": "第8章 原根与指数", "type": "证明题", "knowledge_point": "原根存在性", "stem": "题8-3 证明：不存在模55的原根。", "answer": "原根存在定理：模m存在原根当且仅当m=2,4,p^k,2p^k（p为奇素数，k≥1）。\n55=5×11，是两个不同奇素数的乘积，不属于上述任何形式，因此不存在模55的原根。即Z_55*不是循环群。"}, {"id": 106, "chapter": "第8章 原根与指数", "type": "计算题", "knowledge_point": "原根个数", "stem": "题8-4 模47的原根共有多少个？写出模47的所有原根。", "answer": "φ(47)=46=2×23，原根个数=φ(φ(47))=φ(46)=46×(1−1/2)(1−1/23)=22个。\n找到原根：验证g=5，5²≡25≢1(mod 47), 5²³≢1(mod 47)，故5是原根。\n所有原根：5^k(mod 47)，其中(k,46)=1，即k=1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43。"}, {"id": 107, "chapter": "第8章 原根与指数", "type": "证明题", "knowledge_point": "矩阵环的性质", "stem": "题8-6 令M₂(R)为所有2×2实系数矩阵的集合，定义加法和乘法为矩阵加法和乘法。证明：(M₂(R),+,·)是一个环，但不是除环(division ring)。", "answer": "M₂(R)对矩阵加法构成交换群（封闭性、结合律、零矩阵为零元、负矩阵为逆元）。\n对乘法构成半群（封闭性、结合律），且满足分配律：A(B+C)=AB+AC, (A+B)C=AC+BC。\n单位矩阵I是单位元，故M₂(R)是有单位元的环。\nM₂(R)不是除环：不是每个非零矩阵都有乘法逆元。例：A=[1 0;0 0]非零但|A|=0，不可逆。"}, {"id": 108, "chapter": "第8章 原根与指数", "type": "证明题", "knowledge_point": "复数子集的环结构", "stem": "题8-7 令Z[i√7]={a+bi√7|a,b∈Z}，证明：(Z[i√7],+,·)是一个环。", "answer": "1. 加法封闭：(a+bi√7)+(c+di√7)=(a+c)+(b+d)i√7∈Z[i√7]。加法交换群成立，零元0+0i√7，负元−a−bi√7。\n2. 乘法封闭：(a+bi√7)(c+di√7)=ac+adi√7+bci√7+bdi²·7=(ac−7bd)+(ad+bc)i√7∈Z[i√7]。\n3. 结合律与分配律由复数运算法则继承。\n4. 有单位元1=1+0i√7，乘法交换。\n因此Z[i√7]是有单位元的交换环，无零因子故为整环。"}, {"id": 109, "chapter": "第8章 原根与指数", "type": "计算题", "knowledge_point": "置换的乘法与逆", "stem": "题8-8 设σ=(1 4 2 6)(2 3)，τ=(3 5 6 4)。求στ, τσ, σ⁻¹, τ⁻¹，并判断σ,τ是否为偶排列。", "answer": "化简σ：先应用(1 4 2 6)再应用(2 3)（从右到左）。\n1→4→4, 4→2→3, 2→6→6, 6→1→1, 3→3→2, 5→5→5, 7→7→7,...\nσ=(1 4 3 2 6)，是5-轮换。\nτ=(3 5 6 4)，是4-轮换。\n\nστ（先τ后σ）：1→1→4, 4→3→2, 2→2→6, 6→4→3, 3→5→5, 5→6→1。\nστ=(1 4 2 6 3 5)，是6-轮换。\n\nτσ（先σ后τ）：1→4→3, 3→2→2, 2→6→4, 6→1→1, 4→3→5, 5→5→6。\nτσ=(1 3 2 4 5 6)，是6-轮换。\n\nσ⁻¹=(1 6 2 3 4), τ⁻¹=(3 4 6 5)。\n\n奇偶性：σ是5-轮换=4个对换，偶排列。τ是4-轮换=3个对换，奇排列。"}, {"id": 110, "chapter": "第8章 原根与指数", "type": "证明题", "knowledge_point": "共轭元素的阶", "stem": "题8-10 设G是一个群，a,b∈G。证明：ab与ba具有相同的阶。", "answer": "注意到ab=b⁻¹(ba)b，即ab与ba在G中共轭。\n若(ba)^n=e，则(ab)^n=(b⁻¹(ba)b)^n=b⁻¹(ba)^n b=b⁻¹eb=e。\n反之若(ab)^n=e，同理(ba)^n=e。\n故ord(ab)|ord(ba)且ord(ba)|ord(ab)，得ord(ab)=ord(ba)。"}, {"id": 111, "chapter": "第8章 原根与指数", "type": "证明题", "knowledge_point": "置换的奇偶性判定", "stem": "题8-11 证明：一个置换的奇偶性等于其轮换分解中长度为偶数的轮换个数的奇偶性。", "answer": "一个k-轮换可分解为k−1个对换的乘积。\n- 若k为奇数，k−1为偶数，该轮换是偶置换（不改变奇偶性）。\n- 若k为偶数，k−1为奇数，该轮换是奇置换（改变奇偶性）。\n\n设σ的轮换分解中有m个长度为偶数的轮换，其余轮换长度均为奇数。\n每个奇数长度轮换贡献偶数个对换，每个偶数长度轮换贡献奇数个对换。\n因此σ的总对换数的奇偶性 = m个奇数之和的奇偶性 = m的奇偶性。\n即σ为偶置换⇔m为偶数；σ为奇置换⇔m为奇数。"}];
+
+// ===== State =====
+const STORAGE_KEY = 'infosec_math_quiz';
+let allQuestions = [];
+let state = loadState();
+let filters = loadFilters();
+let shuffledQueue = [];
+let historyStack = [];
+
+function defaultState(){
+  return {seen:[],mastered:[],review:[],bookmarked:[],currentId:null,shuffledQueue:[],mode:'random'};
+}
+function defaultFilters(){
+  return {types:[],chapters:[]};
+}
+function loadState(){
+  try{return {...defaultState(),...JSON.parse(localStorage.getItem(STORAGE_KEY+'_state'))}}catch(e){return defaultState()}
+}
+function loadFilters(){
+  try{return {...defaultFilters(),...JSON.parse(localStorage.getItem(STORAGE_KEY+'_filters'))}}catch(e){return defaultFilters()}
+}
+function saveState(){localStorage.setItem(STORAGE_KEY+'_state',JSON.stringify(state))}
+function saveFilters(){localStorage.setItem(STORAGE_KEY+'_filters',JSON.stringify(filters))}
+
+// ===== Init =====
+function init(){
+  try{
+    allQuestions = EMBEDDED_QUESTIONS;
+  }catch(e){
+    document.getElementById('cardArea').innerHTML = '<div class="question-card" style="padding:40px 24px;text-align:center"><p style="color:var(--text-secondary);margin-bottom:12px">题库数据加载失败</p><p style="font-size:0.85rem;color:var(--text-muted)">请刷新页面重试</p></div>';
+    return;
+  }
+
+  // Parse mode from URL
+  const params = new URLSearchParams(location.search);
+  state.mode = params.get('mode') || 'random';
+
+  buildChapterTree();
+  buildFilters();
+  applyFiltersAndShuffle();
+  if(!state.currentId && shuffledQueue.length>0){
+    state.currentId = shuffledQueue[0];
+  }
+  renderQuestion();
+  updateProgress();
+  updateSidebarHighlight();
+  bindEvents();
+}
+
+// ===== Chapter Tree =====
+function buildChapterTree(){
+  const chapters = {};
+  allQuestions.forEach(q => {
+    const ch = q.chapter;
+    if(!chapters[ch]) chapters[ch] = [];
+    chapters[ch].push(q);
+  });
+
+  const list = document.getElementById('chapterList');
+  list.innerHTML = '';
+
+  for(const [chName, qs] of Object.entries(chapters)){
+    const li = document.createElement('li');
+    li.className = 'chapter-item';
+
+    const toggle = document.createElement('button');
+    toggle.className = 'chapter-toggle' + (state.mode==='chapter' ? ' expanded' : '');
+    toggle.innerHTML = `
+      <span class="ch-name">${chName}</span>
+      <span class="ch-count">${qs.length}题</span>
+      <span class="ch-arrow">▶</span>
+    `;
+    toggle.addEventListener('click',()=>{
+      toggle.classList.toggle('expanded');
+      sublist.classList.toggle('open');
+    });
+
+    const sublist = document.createElement('ul');
+    sublist.className = 'question-sublist' + (state.mode==='chapter' ? ' open' : '');
+
+    qs.forEach(q => {
+      const si = document.createElement('li');
+      si.className = 'question-subitem';
+      const isBm = state.bookmarked.includes(q.id);
+      const statusIcon = state.mastered.includes(q.id) ? '✓' : state.review.includes(q.id) ? '↩' : '';
+      si.innerHTML = `
+        ${isBm ? '<span class="q-star">★</span>' : ''}
+        <span>${q.stem.replace(/^题[\d\-]+ /,'').substring(0,22)}...</span>
+        ${statusIcon ? `<span class="q-status">${statusIcon}</span>` : ''}
+      `;
+      si.addEventListener('click',()=>{
+        jumpToQuestion(q.id);
+        closeSidebar();
+      });
+      si.dataset.qid = q.id;
+      sublist.appendChild(si);
+    });
+
+    li.appendChild(toggle);
+    li.appendChild(sublist);
+    list.appendChild(li);
+  }
+}
+
+// ===== Filters =====
+function buildFilters(){
+  const types = [...new Set(allQuestions.map(q=>q.type))];
+  const typeDiv = document.getElementById('typeFilters');
+  typeDiv.innerHTML = types.map(t=>{
+    const active = filters.types.length===0 || filters.types.includes(t);
+    return `<button class="filter-chip${active?' active':''}" data-type="${t}">${t}</button>`;
+  }).join('');
+
+  const chapters = [...new Set(allQuestions.map(q=>q.chapter))];
+  const chDiv = document.getElementById('chapterFilters');
+  chDiv.innerHTML = chapters.map(c=>{
+    const active = filters.chapters.length===0 || filters.chapters.includes(c);
+    return `<button class="filter-chip${active?' active':''}" data-chapter="${c}">${c.replace(/^第(\d+)章.*/,'Ch$1')}</button>`;
+  }).join('');
+}
+
+function getFilteredQuestions(){
+  return allQuestions.filter(q=>{
+    if(filters.types.length>0 && !filters.types.includes(q.type)) return false;
+    if(filters.chapters.length>0 && !filters.chapters.includes(q.chapter)) return false;
+    return true;
+  });
+}
+
+function applyFiltersAndShuffle(){
+  const filtered = getFilteredQuestions();
+  const ids = filtered.map(q=>q.id);
+  // Fisher-Yates
+  const arr = [...ids];
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  shuffledQueue = arr;
+  state.shuffledQueue = arr;
+  saveState();
+}
+
+// ===== Render Question =====
+function renderQuestion(){
+  if(!state.currentId || allQuestions.length===0) return;
+
+  const q = allQuestions.find(x=>x.id===state.currentId);
+  if(!q) return;
+
+  // Mark seen
+  if(!state.seen.includes(q.id)){
+    state.seen.push(q.id);
+    saveState();
+  }
+
+  const cardArea = document.getElementById('cardArea');
+  const isBm = state.bookmarked.includes(q.id);
+  const isMastered = state.mastered.includes(q.id);
+  const isReview = state.review.includes(q.id);
+
+  const chapterShort = q.chapter.replace(/^第(\d+)章\s*.+/,'第$1章');
+  const qNum = `第 ${q.id} 题`;
+
+  cardArea.innerHTML = `
+    <div class="question-card" id="questionCard">
+      <div class="card-header">
+        <span class="badge badge-chapter">${chapterShort}</span>
+        <span class="badge badge-type">${q.type}</span>
+        <span class="badge badge-kp">${q.knowledge_point}</span>
+        <button class="bookmark-btn${isBm?' active':''}" id="bookmarkBtn" aria-label="${isBm?'取消收藏':'收藏'}" title="${isBm?'取消收藏':'收藏'}">${isBm?'★':'☆'}</button>
+      </div>
+      <div class="card-body">
+        <div class="q-number">${qNum}</div>
+        <div class="q-stem" id="stemContent">${escapeHtml(q.stem)}</div>
+      </div>
+      <div class="card-nav">
+        <button class="nav-btn" id="prevBtn" ${historyStack.length===0?'disabled':''}>← 上一题</button>
+        <button class="answer-toggle-btn" id="answerToggle">查看答案</button>
+        <button class="nav-btn" id="nextBtn">下一题 →</button>
+      </div>
+      <div class="answer-panel" id="answerPanel">
+        <div class="answer-inner">
+          <h4>参考答案</h4>
+          <div class="answer-content" id="answerContent">${escapeHtml(q.answer)}</div>
+          <div class="assess-row">
+            <button class="assess-btn assess-mastered${isMastered?' active':''}" id="assessMastered">
+              ✓ ${isMastered?'已掌握':'标记已掌握'}
+            </button>
+            <button class="assess-btn assess-review${isReview?' active':''}" id="assessReview">
+              ↩ ${isReview?'需复习':'标记需复习'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Render KaTeX
+  renderMathInElement(document.getElementById('stemContent'));
+  if(q.answer) renderMathInElement(document.getElementById('answerContent'));
+
+  // Bind card events
+  bindCardEvents();
+  updateProgress();
+  updateSidebarHighlight();
+  showKbdHint();
+
+  // Auto-show answer if previously seen
+  if(state.seen.includes(q.id) && !state.mastered.includes(q.id) && !state.review.includes(q.id)){
+    // Don't auto-show
+  }
+}
+
+function bindCardEvents(){
+  document.getElementById('prevBtn').addEventListener('click',goPrev);
+  document.getElementById('nextBtn').addEventListener('click',goNext);
+  document.getElementById('answerToggle').addEventListener('click',toggleAnswer);
+  document.getElementById('bookmarkBtn').addEventListener('click',toggleBookmark);
+  document.getElementById('assessMastered').addEventListener('click',()=>toggleAssess('mastered'));
+  document.getElementById('assessReview').addEventListener('click',()=>toggleAssess('review'));
+}
+
+function goPrev(){
+  if(historyStack.length===0) return;
+  const prevId = historyStack.pop();
+  // Put current back into queue at front
+  if(state.currentId) shuffledQueue.unshift(state.currentId);
+  state.currentId = prevId;
+  saveState();
+  renderQuestion();
+}
+
+function goNext(){
+  if(state.currentId) historyStack.push(state.currentId);
+
+  if(shuffledQueue.length===0){
+    applyFiltersAndShuffle();
+    if(shuffledQueue.length===0){
+      document.getElementById('cardArea').innerHTML = '<div class="question-card" style="padding:40px 24px;text-align:center"><p style="color:var(--text-secondary);margin-bottom:16px">当前筛选条件无匹配题目</p><button class="nav-btn" onclick="clearAllFilters();renderQuestion();" style="margin:0 auto">清除筛选</button></div>';
+      return;
+    }
+  }
+
+  state.currentId = shuffledQueue.pop();
+  saveState();
+  renderQuestion();
+}
+
+function jumpToQuestion(id){
+  if(state.currentId && state.currentId !== id) historyStack.push(state.currentId);
+  // Remove id from queue if present
+  const idx = shuffledQueue.indexOf(id);
+  if(idx>=0) shuffledQueue.splice(idx,1);
+  state.currentId = id;
+  saveState();
+  renderQuestion();
+}
+
+function toggleAnswer(){
+  const panel = document.getElementById('answerPanel');
+  const btn = document.getElementById('answerToggle');
+  const isOpen = panel.classList.contains('open');
+  if(isOpen){
+    panel.classList.remove('open');
+    btn.textContent = '查看答案';
+    btn.classList.remove('showing');
+  }else{
+    panel.classList.add('open');
+    btn.textContent = '隐藏答案';
+    btn.classList.add('showing');
+    // Auto-mark as seen
+    if(state.currentId && !state.seen.includes(state.currentId)){
+      state.seen.push(state.currentId);
+      saveState();
+    }
+  }
+}
+
+function toggleBookmark(){
+  if(!state.currentId) return;
+  const idx = state.bookmarked.indexOf(state.currentId);
+  const btn = document.getElementById('bookmarkBtn');
+  if(idx>=0){
+    state.bookmarked.splice(idx,1);
+    btn.classList.remove('active');
+    btn.innerHTML = '☆';
+    btn.setAttribute('aria-label','收藏');
+  }else{
+    state.bookmarked.push(state.currentId);
+    btn.classList.add('active');
+    btn.innerHTML = '★';
+    btn.setAttribute('aria-label','取消收藏');
+  }
+  saveState();
+  updateSidebarHighlight();
+}
+
+function toggleAssess(type){
+  if(!state.currentId) return;
+  const other = type==='mastered'?'review':'mastered';
+  const arr = type==='mastered'?state.mastered:state.review;
+  const otherArr = type==='mastered'?state.review:state.mastered;
+
+  const idx = arr.indexOf(state.currentId);
+  if(idx>=0){
+    arr.splice(idx,1);
+    document.getElementById('assess'+ (type==='mastered'?'Mastered':'Review')).classList.remove('active');
+    document.getElementById('assess'+ (type==='mastered'?'Mastered':'Review')).innerHTML = type==='mastered' ? '✓ 标记已掌握' : '↩ 标记需复习';
+  }else{
+    arr.push(state.currentId);
+    // Remove from other if present
+    const oi = otherArr.indexOf(state.currentId);
+    if(oi>=0) otherArr.splice(oi,1);
+    document.getElementById('assess'+ (type==='mastered'?'Mastered':'Review')).classList.add('active');
+    document.getElementById('assess'+ (type==='mastered'?'Mastered':'Review')).innerHTML = type==='mastered' ? '✓ 已掌握' : '↩ 需复习';
+    // Update other button
+    const otherBtn = document.getElementById('assess'+ (other==='mastered'?'Mastered':'Review'));
+    if(otherBtn){
+      otherBtn.classList.remove('active');
+      otherBtn.innerHTML = other==='mastered' ? '✓ 标记已掌握' : '↩ 标记需复习';
+    }
+  }
+  saveState();
+  updateProgress();
+}
+
+function clearAllFilters(){
+  filters = defaultFilters();
+  saveFilters();
+  buildFilters();
+  applyFiltersAndShuffle();
+}
+
+// ===== Progress =====
+function updateProgress(){
+  const total = getFilteredQuestions().length;
+  const seenPct = total>0 ? Math.round(state.seen.filter(id=>getFilteredQuestions().some(q=>q.id===id)).length/total*100) : 0;
+  const masteredPct = total>0 ? Math.round(state.mastered.filter(id=>getFilteredQuestions().some(q=>q.id===id)).length/total*100) : 0;
+
+  document.getElementById('progressLabel').textContent = `已看 ${state.seen.length}/${allQuestions.length}`;
+  document.getElementById('progressStats').textContent = `掌握 ${state.mastered.length} · 需复习 ${state.review.length} · 收藏 ${state.bookmarked.length}`;
+  document.getElementById('progressSeen').style.width = seenPct + '%';
+  document.getElementById('progressMastered').style.width = masteredPct + '%';
+}
+
+function updateSidebarHighlight(){
+  document.querySelectorAll('.question-subitem').forEach(el=>{
+    el.classList.toggle('current', parseInt(el.dataset.qid) === state.currentId);
+  });
+  document.querySelectorAll('.chapter-toggle').forEach(el=>{
+    el.classList.remove('active');
+  });
+}
+
+// ===== Stats Modal =====
+function openStats(){
+  const total = allQuestions.length;
+  const mastered = state.mastered.length;
+  const review = state.review.length;
+  const seen = state.seen.length;
+  const unseen = total - seen;
+  const rate = total>0 ? Math.round(mastered/total*100) : 0;
+
+  let html = `
+    <div class="stat-item">
+      <div class="stat-label">总进度（已看 ${seen}/${total}）</div>
+      <div class="stat-bar"><div class="stat-bar-fill stat-bar-seen" style="width:${Math.round(seen/total*100)}%"></div></div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">掌握率（已掌握 ${mastered}/${total}）</div>
+      <div class="stat-bar"><div class="stat-bar-fill stat-bar-mastered" style="width:${rate}%"></div></div>
+    </div>
+    <div class="chapter-stats">
+      <h3>各章节覆盖</h3>
+  `;
+
+  const chapters = [...new Set(allQuestions.map(q=>q.chapter))];
+  const weakChapters = [];
+  chapters.forEach(ch=>{
+    const chQs = allQuestions.filter(q=>q.chapter===ch);
+    const chTotal = chQs.length;
+    const chMastered = chQs.filter(q=>state.mastered.includes(q.id)).length;
+    const chReview = chQs.filter(q=>state.review.includes(q.id)).length;
+    const chSeen = chQs.filter(q=>state.seen.includes(q.id)).length;
+    const chUnseen = chTotal - chSeen;
+    const mPct = Math.round(chMastered/chTotal*100);
+    const rPct = Math.round(chReview/chTotal*100);
+    const uPct = Math.round(chUnseen/chTotal*100);
+    const short = ch.replace(/^第(\d+)章\s*.+/,'第$1章');
+
+    if(mPct < 30 && chSeen > 0) weakChapters.push(short);
+
+    html += `
+      <div class="ch-stat-row">
+        <span class="ch-stat-name">${short}</span>
+        <div class="ch-stat-bar-wrap">
+          <div class="ch-stat-mastered" style="width:${mPct}%"></div>
+          <div class="ch-stat-review" style="width:${rPct}%"></div>
+        </div>
+        <span class="ch-stat-pct">${mPct}%</span>
+      </div>
+    `;
+  });
+
+  html += '</div>';
+
+  if(weakChapters.length>0){
+    html += '<div class="weak-section"><strong style="font-size:0.85rem;color:var(--text-secondary)">薄弱章节：</strong>';
+    weakChapters.forEach(ch=>{
+      html += `<span class="weak-tag">${ch}</span>`;
+    });
+    html += '</div>';
+  }
+
+  document.getElementById('statsContent').innerHTML = html;
+  document.getElementById('statsModal').classList.add('open');
+}
+function closeStats(){
+  document.getElementById('statsModal').classList.remove('open');
+}
+
+// ===== Mobile =====
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarBackdrop').classList.add('open');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('open');
+}
+
+// ===== Events =====
+function bindEvents(){
+  document.getElementById('hamburger').addEventListener('click',openSidebar);
+  document.getElementById('sidebarBackdrop').addEventListener('click',closeSidebar);
+
+  // Filter clicks
+  document.getElementById('typeFilters').addEventListener('click',e=>{
+    if(e.target.classList.contains('filter-chip')){
+      const type = e.target.dataset.type;
+      e.target.classList.toggle('active');
+      if(e.target.classList.contains('active')){
+        if(!filters.types.includes(type)) filters.types.push(type);
+      }else{
+        filters.types = filters.types.filter(t=>t!==type);
+      }
+      if(filters.types.length === [...new Set(allQuestions.map(q=>q.type))].length) filters.types = [];
+      saveFilters();
+      buildFilters();
+      applyFiltersAndShuffle();
+      state.currentId = shuffledQueue.length>0 ? shuffledQueue[0] : null;
+      historyStack = [];
+      saveState();
+      renderQuestion();
+    }
+  });
+
+  document.getElementById('chapterFilters').addEventListener('click',e=>{
+    if(e.target.classList.contains('filter-chip')){
+      const chapters = [...new Set(allQuestions.map(q=>q.chapter))];
+      const idx = Array.from(e.target.parentElement.children).indexOf(e.target);
+      const ch = chapters[idx];
+      e.target.classList.toggle('active');
+      if(e.target.classList.contains('active')){
+        if(!filters.chapters.includes(ch)) filters.chapters.push(ch);
+      }else{
+        filters.chapters = filters.chapters.filter(c=>c!==ch);
+      }
+      if(filters.chapters.length === chapters.length) filters.chapters = [];
+      saveFilters();
+      buildFilters();
+      applyFiltersAndShuffle();
+      state.currentId = shuffledQueue.length>0 ? shuffledQueue[0] : null;
+      historyStack = [];
+      saveState();
+      renderQuestion();
+    }
+  });
+
+  // Stats
+  document.getElementById('statsTrigger').addEventListener('click',()=>{openStats();closeSidebar();});
+  document.getElementById('statsClose').addEventListener('click',closeStats);
+  document.getElementById('statsModal').addEventListener('click',e=>{if(e.target===e.currentTarget) closeStats();});
+
+  // Keyboard
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+    switch(e.key){
+      case 'ArrowLeft': e.preventDefault(); goPrev(); break;
+      case 'ArrowRight': e.preventDefault(); goNext(); break;
+      case ' ': e.preventDefault(); toggleAnswer(); break;
+      case 's': if(!e.ctrlKey&&!e.metaKey){e.preventDefault();toggleBookmark();} break;
+      case 'Escape': closeStats(); closeSidebar(); break;
+    }
+  });
+}
+
+// ===== KaTeX =====
+function renderMathInElement(el){
+  if(!el) return;
+  // Render display math $$...$$
+  let html = el.innerHTML;
+  html = html.replace(/\$\$([\s\S]*?)\$\$/g,(_,m)=>katex.renderToString(m.trim(),{displayMode:true,throwOnError:false}));
+  // Render inline math $...$
+  html = html.replace(/\$(.*?)\$/g,(_,m)=>katex.renderToString(m.trim(),{displayMode:false,throwOnError:false}));
+  el.innerHTML = html;
+}
+
+// ===== Keyboard Hint =====
+function showKbdHint(){
+  const hint = document.getElementById('kbdHint');
+  hint.classList.add('show');
+  clearTimeout(hint._timeout);
+  hint._timeout = setTimeout(()=>hint.classList.remove('show'),5000);
+}
+
+// ===== Helpers =====
+function escapeHtml(str){
+  if(!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ===== Start =====
+init();
+</script>
+</body>
+</html>
