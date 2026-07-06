@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>淇℃伅瀹夊叏鏁板鍩虹 路 棰樺簱绯荤粺</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg-primary:#FAF9F6;
+  --bg-overlay:rgba(0,0,0,0.42);
+  --text-primary:#2D3436;
+  --text-secondary:#636E72;
+  --text-inverse:#FFFFFF;
+  --accent:#4A6FA5;
+  --accent-dark:#3A5A85;
+  --accent-bg:#EDF2F7;
+  --emphasis:#E8833A;
+  --emphasis-dark:#D9732A;
+  --font-sans:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,-apple-system,sans-serif;
+  --leading-relaxed:1.75;
+}
+
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font-sans);color:var(--text-primary);background:#0a0a0a}
+
+.bg-wrapper{
+  position:fixed;inset:0;z-index:-2;
+  overflow:hidden;
+}
+.bg-wrapper img{
+  width:100%;height:100%;object-fit:cover;
+  filter:brightness(0.55) saturate(1.1);
+}
+.bg-overlay{
+  position:fixed;inset:0;z-index:-1;
+  background:linear-gradient(135deg, rgba(20,25,35,0.55) 0%, rgba(10,15,25,0.40) 100%);
+}
+
+.main{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100vh;padding:0 clamp(1rem,5vw,3rem);
+  animation:fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(28px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.logo-mark{
+  width:72px;height:72px;border-radius:20px;
+  background:rgba(255,255,255,0.12);
+  backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:clamp(1.5rem,3vh,2.5rem);
+  border:1px solid rgba(255,255,255,0.18);
+}
+.logo-mark svg{width:38px;height:38px;fill:none;stroke:white;stroke-width:1.8}
+
+.title{
+  font-size:clamp(2rem,5vw,3.2rem);
+  font-weight:700;color:var(--text-inverse);
+  letter-spacing:0.02em;text-align:center;
+  line-height:1.3;margin-bottom:0.5rem;
+}
+.subtitle{
+  font-size:clamp(0.95rem,2vw,1.15rem);
+  color:rgba(255,255,255,0.72);
+  font-weight:400;text-align:center;
+  margin-bottom:clamp(2.5rem,6vh,3.5rem);
+  letter-spacing:0.04em;
+}
+.subtitle span{color:var(--emphasis);font-weight:500}
+
+.entry-group{
+  display:flex;gap:clamp(0.75rem,2vw,1.25rem);
+  flex-wrap:wrap;justify-content:center;
+}
+
+.btn{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  padding:clamp(0.85rem,1.5vw,1rem) clamp(1.8rem,3vw,2.5rem);
+  font-size:clamp(0.95rem,1.5vw,1.08rem);
+  font-weight:600;font-family:var(--font-sans);
+  border-radius:14px;cursor:pointer;
+  transition:all 0.25s cubic-bezier(0.16,1,0.3,1);
+  text-decoration:none;position:relative;
+  letter-spacing:0.02em;
+}
+.btn-primary{
+  background:var(--accent);
+  color:var(--text-inverse);
+  border:none;
+  box-shadow:0 4px 20px rgba(74,111,165,0.35);
+}
+.btn-primary:hover{
+  background:var(--accent-dark);
+  transform:translateY(-2px);
+  box-shadow:0 8px 30px rgba(74,111,165,0.45);
+}
+.btn-primary:active{transform:scale(0.97)}
+
+.btn-outline{
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(8px);
+  border:1.5px solid rgba(255,255,255,0.28);
+  color:var(--text-inverse);
+}
+.btn-outline:hover{
+  background:rgba(255,255,255,0.16);
+  border-color:rgba(255,255,255,0.45);
+  transform:translateY(-2px);
+}
+.btn-outline:active{transform:scale(0.97)}
+
+.btn svg{width:20px;height:20px;flex-shrink:0}
+
+.footer{
+  position:fixed;bottom:clamp(1rem,3vh,2rem);
+  left:50%;transform:translateX(-50%);
+  font-size:0.8rem;color:rgba(255,255,255,0.38);
+  letter-spacing:0.05em;
+  animation:fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.3s both;
+}
+.footer a{color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s}
+.footer a:hover{color:rgba(255,255,255,0.8)}
+
+@media(max-width:480px){
+  .entry-group{flex-direction:column;width:100%;max-width:280px}
+  .btn{justify-content:center;width:100%}
+  .logo-mark{width:56px;height:56px;border-radius:16px}
+  .logo-mark svg{width:30px;height:30px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-wrapper">
+  <img src="assets/preview.gif" alt="" aria-hidden="true" loading="eager">
+</div>
+<div class="bg-overlay"></div>
+
+<main class="main">
+  <div class="logo-mark" aria-hidden="true">
+    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+  </div>
+  <h1 class="title">淇℃伅瀹夊叏鏁板鍩虹</h1>
+  <p class="subtitle">棰樺簱绯荤粺 路 <span>8 绔?111 棰?/span> 路 鏁拌 路 浠ｆ暟 路 浼界綏鐡﹀煙</p>
+  <div class="entry-group">
+    <a href="quiz.html?mode=random" class="btn btn-primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      闅忔満鍒烽
+    </a>
+    <a href="quiz.html?mode=chapter" class="btn btn-outline">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg>
+      鎸夌珷鑺傚涔?    </a>
+  </div>
+</main>
+
+<footer class="footer">
+  淇℃伅瀹夊叏鏁板鍩虹棰樺簱 &copy; 2026 路 
+  <a href="https://github.com/tao-dev06/infosec-math-quiz" target="_blank" rel="noopener">GitHub</a>
+</footer>
+
+</body>
+</html>
